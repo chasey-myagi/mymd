@@ -46,16 +46,26 @@
   }
 
   async function fetchContent(url: string): Promise<string> {
-    if (url.startsWith('file://')) {
+    const hasChromeApi = typeof chrome !== 'undefined' && chrome.runtime?.sendMessage
+
+    if (url.startsWith('file://') && hasChromeApi) {
       const result = await chrome.storage.session.get(`file_content_${url}`)
       return result[`file_content_${url}`] ?? ''
     }
-    return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ type: 'FETCH_URL', url }, (response) => {
-        if (response?.success) resolve(response.content)
-        else reject(new Error(response?.error ?? 'Failed to fetch'))
+
+    if (hasChromeApi) {
+      return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ type: 'FETCH_URL', url }, (response) => {
+          if (response?.success) resolve(response.content)
+          else reject(new Error(response?.error ?? 'Failed to fetch'))
+        })
       })
-    })
+    }
+
+    // Fallback: direct fetch (works outside extension context)
+    const res = await fetch(url)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return res.text()
   }
 
   async function loadDocument(): Promise<void> {
