@@ -14,6 +14,9 @@ importers:
       '@traptitech/markdown-it-katex':
         specifier: ^3.6.0
         version: 3.6.0
+      js-yaml:
+        specifier: ^4.1.1
+        version: 4.1.1
       katex:
         specifier: ^0.16.38
         version: 0.16.38
@@ -72,6 +75,9 @@ importers:
       '@types/chrome':
         specifier: ^0.1.38
         version: 0.1.38
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
       '@types/katex':
         specifier: ^0.16.8
         version: 0.16.8
@@ -632,6 +638,9 @@ packages:
   '@types/har-format@1.2.16':
     resolution: {integrity: sha512-fluxdy7ryD3MV6h8pTfTYpy/xQzCFC7m89nOH9y94cNqJ1mDIDPut7MnRHI3F6qRmh/cT2fUjG1MLdCNb4hE9A==}
 
+  '@types/js-yaml@4.0.9':
+    resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
+
   '@types/katex@0.16.8':
     resolution: {integrity: sha512-trgaNyfU+Xh2Tc+ABIb44a5AYUpicB3uwirOioeOkNPPbmgRNtcWyDeeFRzjPZENO9Vq8gvVqfhaaXWLlevVwg==}
 
@@ -1102,6 +1111,10 @@ packages:
 
   js-tokens@9.0.1:
     resolution: {integrity: sha512-mxa9E9ITFOt0ban3j6L5MpjwegGz6lBQmM1IJkWeBZGcMxto50+eWdjC/52xDbS2vy0k7vIMK0Fe2wfL9OQSpQ==}
+
+  js-yaml@4.1.1:
+    resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
+    hasBin: true
 
   jsdom@29.0.0:
     resolution: {integrity: sha512-9FshNB6OepopZ08unmmGpsF7/qCjxGPbo3NbgfJAnPeHXnsODE9WWffXZtRFRFe0ntzaAOcSKNJFz8wiyvF1jQ==}
@@ -2173,6 +2186,8 @@ snapshots:
 
   '@types/har-format@1.2.16': {}
 
+  '@types/js-yaml@4.0.9': {}
+
   '@types/katex@0.16.8': {}
 
   '@types/linkify-it@5.0.0': {}
@@ -2697,6 +2712,10 @@ snapshots:
   isexe@2.0.0: {}
 
   js-tokens@9.0.1: {}
+
+  js-yaml@4.1.1:
+    dependencies:
+      argparse: 2.0.1
 
   jsdom@29.0.0:
     dependencies:
