@@ -125,6 +125,7 @@
     <div class="popup-scroll">
     <!-- ═══ Identity ═══ -->
     <div class="identity">
+      <img class="identity-icon" src="../assets/icons/icon48.png" alt="mymd" width="24" height="24" />
       <div class="wordmark">mymd</div>
     </div>
 
@@ -329,6 +330,14 @@
   /* ─── Identity ─── */
   .identity {
     padding: 14px 20px 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .identity-icon {
+    border-radius: 6px;
+    flex-shrink: 0;
   }
 
   .wordmark {
