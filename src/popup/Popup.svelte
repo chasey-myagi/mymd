@@ -122,6 +122,7 @@
 
 {#if isLoaded}
   <div class="popup">
+    <div class="popup-scroll">
     <!-- ═══ Identity ═══ -->
     <div class="identity">
       <div class="wordmark">mymd</div>
@@ -280,6 +281,7 @@
       <span class="foot-dot">·</span>
       <button class="foot-btn" on:click={openTestPage}>{t('openTestPage', settings.language)}</button>
     </div>
+    </div>
   </div>
 {/if}
 
@@ -306,13 +308,23 @@
     font-size: 13px;
     line-height: 1.35;
     width: 340px;
-    max-height: 560px;
-    overflow-y: auto;
+    max-height: 552px;
     -webkit-font-smoothing: antialiased;
     border-radius: 12px;
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.12),
+      0 2px 8px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
   }
 
-  .popup::-webkit-scrollbar { width: 0; }
+  .popup-scroll {
+    max-height: 544px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .popup-scroll::-webkit-scrollbar { width: 0; }
 
   /* ─── Identity ─── */
   .identity {
