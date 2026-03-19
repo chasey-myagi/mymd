@@ -14,18 +14,25 @@ function getViewerUrl(originalUrl: string): string {
   return `${viewerUrl}?url=${encodeURIComponent(originalUrl)}`
 }
 
-// Redirect HTTP/HTTPS .md URLs to viewer
+// Set session storage access level for content scripts
+chrome.storage.session.setAccessLevel({
+  accessLevel: 'TRUSTED_AND_UNTRUSTED_CONTEXTS'
+}).catch(() => { /* ignore if already set */ })
+
+// Redirect HTTP/HTTPS .md URLs to viewer (file:// handled by content script)
 chrome.webNavigation.onBeforeNavigate.addListener(
   (details) => {
     if (details.frameId !== 0) return
     if (!isMarkdownUrl(details.url)) return
     if (details.url.startsWith('chrome-extension://')) return
+    // Skip file:// — content script handles these
+    if (details.url.startsWith('file://')) return
 
     chrome.tabs.update(details.tabId, {
       url: getViewerUrl(details.url),
     })
   },
-  { url: [{ schemes: ['http', 'https', 'file'] }] }
+  { url: [{ schemes: ['http', 'https'] }] }
 )
 
 // Handle content script messages (file:// raw text)
