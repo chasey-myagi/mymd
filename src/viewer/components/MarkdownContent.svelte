@@ -22,10 +22,17 @@
 
     // Enhance code blocks: language label + copy button
     contentEl?.querySelectorAll('pre').forEach(pre => {
-      if (pre.querySelector('.code-copy-btn')) return // already processed
+      if (pre.parentElement?.classList.contains('pre-wrapper')) return // already processed
 
       const code = pre.querySelector('code')
       if (!code) return
+
+      // Wrap pre in .pre-wrapper so overlay elements stay fixed in visible area
+      // even when the code scrolls horizontally
+      const preWrapper = document.createElement('div')
+      preWrapper.className = 'pre-wrapper'
+      pre.parentNode?.insertBefore(preWrapper, pre)
+      preWrapper.appendChild(pre)
 
       // Language label
       const langClass = Array.from(code.classList).find(c => c.startsWith('language-'))
@@ -34,7 +41,7 @@
         const label = document.createElement('span')
         label.className = 'code-lang-label'
         label.textContent = lang
-        pre.appendChild(label)
+        preWrapper.appendChild(label)
       }
 
       // Copy button
@@ -52,7 +59,7 @@
           }, 2000)
         })
       })
-      pre.appendChild(btn)
+      preWrapper.appendChild(btn)
     })
 
     // Wrap tables in scrollable containers

@@ -357,8 +357,11 @@
 }
 
 /* Code blocks */
-.mymd-content pre {
+.mymd-content .pre-wrapper {
   position: relative;
+}
+
+.mymd-content pre {
   margin: 1em 0;
   border-radius: var(--mymd-radius, 6px);
   overflow: auto;
@@ -373,14 +376,19 @@
   border-radius: 0;
 }
 
+/* Label and button are siblings of pre inside .pre-wrapper,
+   so they stay fixed in the visible area even when code scrolls horizontally */
 .code-lang-label {
   position: absolute;
   top: 8px;
   left: 12px;
+  /* Match button's padding-top so text baselines align */
+  padding-top: 4px;
   font-size: 0.7rem;
   color: var(--mymd-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  line-height: 1.4;
   user-select: none;
   font-family: var(--mymd-font-mono, ui-monospace, monospace);
   pointer-events: none;
@@ -397,13 +405,13 @@
   font-size: 0.7rem;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, color 0.15s, background 0.15s;
   color: var(--mymd-text-muted);
   font-family: var(--mymd-font-family, system-ui, sans-serif);
   line-height: 1.4;
 }
 
-.mymd-content pre:hover .code-copy-btn {
+.mymd-content .pre-wrapper:hover .code-copy-btn {
   opacity: 1;
 }
 
