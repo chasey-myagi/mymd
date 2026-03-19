@@ -63,11 +63,18 @@ mymd 不是一个固执己见的渲染器，而是一个高度可定制的画布
 
 基于 rem 和 em，与字体大小成比例。内容区 padding 2rem，组件间距 0.5-1rem。
 
-### Transition Defaults
+### Motion & Animation Philosophy
 
-- 快速交互（hover, focus）: 0.15s ease
-- 面板展开/折叠: 0.2s ease
-- 避免不必要的动画，尊重 prefers-reduced-motion
+**目标：介于"轻微有感"和"精心设计"之间** — 动效有意图、有品质，但不抢戏。
+
+- 快速交互（hover, focus）: `0.15s ease`
+- 面板展开/折叠: `0.2s ease`，使用 `scale + opacity` 组合
+- 主题切换：`background-color / color` 过渡 `0.2s`，避免闪烁
+- Heading anchor / 侧边栏激活态：`opacity` 渐现，`0.15s`
+- 尊重 `prefers-reduced-motion`：所有动画应在媒体查询下降级为即时切换
+- **不该有动效的地方**：内容渲染、字体加载、初始页面出现
+
+每一个动效都必须有"为什么"——引导注意力、提示状态变化、确认操作完成。装饰性纯视觉动效不加。
 
 ### Accessibility
 
@@ -91,9 +98,18 @@ mymd 不是一个固执己见的渲染器，而是一个高度可定制的画布
 - 动画：弹出时 scale + fade，0.2s ease；收起同理
 - 定位：默认在屏幕右侧或右下角，不遮挡内容中心区
 
+### Distribution Target
+
+**开源 + Chrome Web Store 双路径**：
+- 当前阶段：开源仓库优先，面向开发者（clone + build 自行安装）
+- 未来计划：上架 CWS，面向普通用户，届时需要 onboarding 体验、Store 截图质量、权限说明文案
+- **设计优先级影响**：现在应把核心阅读体验做到发布级质量，onboarding/空状态暂不是优先项
+
 ### Priority Focus Areas
 
-当前重点打磨方向（按优先级）：
+当前重点打磨方向（全面提升，无单一优先级）：
 1. **排版细节**：中英文混排、代码块体验、数学公式、表格对齐
-2. **UI 交互精致度**：悬浮胶囊工具栏、微动效、hover 过渡细节
-3. **主题生态**：主题预览、导入/导出、社区主题机制
+2. **UI 交互精致度**：Settings 面板、Toolbar、微动效、hover 过渡细节
+3. **内容区层次**：blockquote、alert、table 的视觉层次和主题适配
+4. **侧边栏**：Outline + FileList 的交互细节、层级表达、激活态
+5. **主题生态**：主题预览、导入/导出、社区主题机制

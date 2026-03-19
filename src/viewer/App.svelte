@@ -5,21 +5,18 @@
   import ProgressBar from './components/ProgressBar.svelte'
   import ScrollTop from './components/ScrollTop.svelte'
   import ErrorPage from './components/ErrorPage.svelte'
-  import FileList from './components/FileList.svelte'
-  import Outline from './components/Outline.svelte'
-  import SettingsPanel from './components/settings/SettingsPanel.svelte'
   import FrontmatterBanner from './components/FrontmatterBanner.svelte'
   import SourceView from './components/SourceView.svelte'
   import ImagePreview from './components/ImagePreview.svelte'
   import { documentState } from './stores/document'
   import { settings, initSettings } from './stores/settings'
-  import { showOutline, showFileList, showSource, scrollProgress } from './stores/ui'
+  import { showSource, scrollProgress } from './stores/ui'
   import { renderMarkdown } from '../lib/markdown/renderer'
   import { parseFrontmatter } from '../lib/frontmatter'
   import { calculateStats } from '../lib/stats'
-  import { applyTheme, resolveColorMode } from '../lib/theme/engine'
+  import { applyTheme, applyCustomCSS, resolveColorMode } from '../lib/theme/engine'
   import { getTheme } from '../lib/theme/themes'
-  import { loadLocal, saveLocal } from '../lib/storage'
+  import { loadLocal, saveLocal, loadSettings } from '../lib/storage'
   import type { Heading } from '../types'
   import './styles/base.css'
   import './styles/content.css'
@@ -137,7 +134,6 @@
   function handleKeydown(e: KeyboardEvent) {
     const { ctrlKey, shiftKey, key } = e
     if (ctrlKey && shiftKey) {
-      if (key === 'O') { e.preventDefault(); showOutline.update(v => !v) }
       if (key === 'S') { e.preventDefault(); showSource.update(v => !v) }
       if (key === 'D') {
         e.preventDefault()
@@ -146,13 +142,17 @@
     }
   }
 
-  $: isFileProtocol = $documentState.url.startsWith('file://')
-
-  // Apply theme reactively
+  // Apply theme + font/layout/customCSS reactively
   $: {
     const mode = resolveColorMode($settings.colorMode)
     const theme = getTheme($settings.theme, mode)
     applyTheme(theme, $settings.cssVariables)
+    applyCustomCSS($settings.customCSS)
+    const el = document.documentElement
+    el.style.setProperty('--mymd-font-family', $settings.fontFamily)
+    el.style.setProperty('--mymd-font-size', $settings.fontSize + 'px')
+    el.style.setProperty('--mymd-line-height', String($settings.lineHeight))
+    el.style.setProperty('--mymd-content-width', $settings.contentWidth + 'px')
   }
 
   onMount(async () => {
@@ -171,6 +171,13 @@
     startAutoRefresh()
     unsubSettings = settings.subscribe(() => startAutoRefresh())
     document.addEventListener('keydown', handleKeydown)
+
+    // Sync settings from Popup in real-time
+    if (typeof chrome !== 'undefined' && chrome.storage?.onChanged) {
+      chrome.storage.onChanged.addListener(() => {
+        loadSettings().then(s => settings.set(s))
+      })
+    }
   })
 
   onDestroy(() => {
@@ -188,7 +195,6 @@
     <ProgressBar />
   {/if}
   <div class="layout">
-    <FileList show={$showFileList && isFileProtocol} />
     <main class="main-content" bind:this={mainContent} on:scroll={handleScroll}>
       {#if $showSource}
         <SourceView />
@@ -197,14 +203,8 @@
         <MarkdownContent />
       {/if}
     </main>
-    {#if $showOutline}
-      <aside class="sidebar sidebar-right">
-        <Outline />
-      </aside>
-    {/if}
   </div>
   <ScrollTop />
   <FloatingPill />
-  <SettingsPanel />
   <ImagePreview />
 {/if}

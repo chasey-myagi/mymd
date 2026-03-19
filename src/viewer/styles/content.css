@@ -1,76 +1,8 @@
-/* ===== Toolbar ===== */
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 12px;
-  height: 44px;
-  background: var(--mymd-toolbar-bg, var(--mymd-surface));
-  border-bottom: 1px solid var(--mymd-border);
-  flex-shrink: 0;
-  gap: 8px;
-}
-
-.toolbar-left,
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.toolbar-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--mymd-text);
-  max-width: 400px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.toolbar-stats {
-  font-size: 0.75rem;
-  color: var(--mymd-text-muted);
-}
-
-.toolbar-btn {
-  background: none;
-  border: 1px solid transparent;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: var(--mymd-radius-sm, 4px);
-  color: var(--mymd-text-muted);
-  font-size: 0.875rem;
-  transition: background 0.15s, color 0.15s;
-  line-height: 1;
-}
-
-.toolbar-btn:hover {
-  background: var(--mymd-hover);
-  color: var(--mymd-text);
-}
-
 /* ===== Layout ===== */
 .layout {
   display: flex;
   flex: 1;
   overflow: hidden;
-}
-
-.sidebar {
-  width: 240px;
-  flex-shrink: 0;
-  overflow-y: auto;
-  background: var(--mymd-sidebar-bg, var(--mymd-surface));
-  border-right: 1px solid var(--mymd-border);
-  padding: 0.5rem;
-}
-
-.sidebar-right {
-  width: 260px;
-  min-width: 200px;
-  border-right: none;
-  border-left: 1px solid var(--mymd-border);
 }
 
 .main-content {
@@ -708,22 +640,3 @@
   transform-origin: center;
 }
 
-/* Settings overlay */
-.settings-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 500;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-}
-
-.settings-panel {
-  width: 360px;
-  height: 100%;
-  overflow-y: auto;
-  background: var(--mymd-bg);
-  box-shadow: var(--mymd-shadow-md, -4px 0 24px rgba(0,0,0,0.2));
-  padding: 1.5rem;
-}
