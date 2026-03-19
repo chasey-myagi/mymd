@@ -4,6 +4,9 @@ import { typoraLight, typoraDark } from './typora'
 import { academicLight, academicDark } from './academic'
 import { readerLight, readerDark } from './reader'
 import { minimalLight, minimalDark } from './minimal'
+import { handwritingLight, handwritingDark } from './handwriting'
+import { cyberpunkLight, cyberpunkDark } from './cyberpunk'
+import { retroLight, retroDark } from './retro'
 
 export interface ThemePair {
   light: MymdTheme
@@ -16,6 +19,9 @@ export const THEMES: Record<string, ThemePair> = {
   academic: { light: academicLight, dark: academicDark },
   reader: { light: readerLight, dark: readerDark },
   minimal: { light: minimalLight, dark: minimalDark },
+  handwriting: { light: handwritingLight, dark: handwritingDark },
+  cyberpunk: { light: cyberpunkLight, dark: cyberpunkDark },
+  retro: { light: retroLight, dark: retroDark },
 }
 
 export function getTheme(name: string, mode: 'light' | 'dark'): MymdTheme {
