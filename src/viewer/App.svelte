@@ -188,11 +188,7 @@
     <ProgressBar />
   {/if}
   <div class="layout">
-    {#if $showFileList && isFileProtocol}
-      <aside class="sidebar sidebar-left">
-        <FileList />
-      </aside>
-    {/if}
+    <FileList show={$showFileList && isFileProtocol} />
     <main class="main-content" bind:this={mainContent} on:scroll={handleScroll}>
       {#if $showSource}
         <SourceView />

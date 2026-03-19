@@ -3,8 +3,9 @@
   import { documentState } from '../stores/document'
   import { parseDirectoryListing } from '../../lib/file-list'
 
+  export let show = true
+
   let files: string[] = []
-  let isFileProtocol = false
 
   $: currentFile = decodeURIComponent($documentState.url.split('/').pop() ?? '')
   $: isFileProtocol = $documentState.url.startsWith('file://')
@@ -32,15 +33,17 @@
   }
 </script>
 
-{#if isFileProtocol && files.length > 0}
-  <nav class="file-list">
-    <h3 class="file-list-title">Files</h3>
-    <ul>
-      {#each files as file}
-        <li class:active={file === currentFile}>
-          <button on:click={() => openFile(file)}>{file}</button>
-        </li>
-      {/each}
-    </ul>
-  </nav>
+{#if show && isFileProtocol && files.length > 0}
+  <aside class="sidebar sidebar-left">
+    <nav class="file-list">
+      <h3 class="file-list-title">Files</h3>
+      <ul>
+        {#each files as file}
+          <li class:active={file === currentFile}>
+            <button on:click={() => openFile(file)}>{file}</button>
+          </li>
+        {/each}
+      </ul>
+    </nav>
+  </aside>
 {/if}
