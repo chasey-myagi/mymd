@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>mymd Icon Candidates</title>
+<style>
+  body { font-family: system-ui; background: #f5f5f5; padding: 40px; display: flex; flex-wrap: wrap; gap: 40px; }
+  .card { background: white; border-radius: 16px; padding: 32px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .card h3 { margin: 16px 0 8px; font-size: 14px; color: #333; }
+  .card p { font-size: 12px; color: #888; margin: 0; }
+  .sizes { display: flex; gap: 16px; align-items: end; margin-top: 12px; justify-content: center; }
+  .sizes span { font-size: 10px; color: #aaa; }
+</style>
+</head>
+<body>
+
+<!-- A: 圆角方块 + 粗体 M -->
+<div class="card">
+  <svg width="128" height="128" viewBox="0 0 128 128">
+    <defs>
+      <linearGradient id="gA" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#6366f1"/>
+        <stop offset="100%" stop-color="#8b5cf6"/>
+      </linearGradient>
+    </defs>
+    <rect width="128" height="128" rx="28" fill="url(#gA)"/>
+    <text x="64" y="88" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="72" font-weight="800" fill="white" letter-spacing="-3">M</text>
+  </svg>
+  <h3>A — Bold M (Violet Gradient)</h3>
+  <p>粗体 M + 紫色渐变圆角方块</p>
+  <div class="sizes">
+    <div>
+      <svg width="48" height="48" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="url(#gA)"/><text x="64" y="88" text-anchor="middle" font-family="system-ui" font-size="72" font-weight="800" fill="white" letter-spacing="-3">M</text></svg>
+      <br><span>48</span>
+    </div>
+    <div>
+      <svg width="16" height="16" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="url(#gA)"/><text x="64" y="88" text-anchor="middle" font-family="system-ui" font-size="72" font-weight="800" fill="white" letter-spacing="-3">M</text></svg>
+      <br><span>16</span>
+    </div>
+  </div>
+</div>
+
+<!-- B: Markdown 向下箭头 -->
+<div class="card">
+  <svg width="128" height="128" viewBox="0 0 128 128">
+    <defs>
+      <linearGradient id="gB" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#3b82f6"/>
+        <stop offset="100%" stop-color="#6366f1"/>
+      </linearGradient>
+    </defs>
+    <rect width="128" height="128" rx="28" fill="url(#gB)"/>
+    <path d="M40 42v44l16-16 16 16V42M80 42v44M80 86l12-16M80 86l-12-16" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </svg>
+  <h3>B — Markdown Symbol (Blue→Violet)</h3>
+  <p>经典 Markdown 标记符号</p>
+  <div class="sizes">
+    <div>
+      <svg width="48" height="48" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="url(#gB)"/><path d="M40 42v44l16-16 16 16V42M80 42v44M80 86l12-16M80 86l-12-16" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      <br><span>48</span>
+    </div>
+    <div>
+      <svg width="16" height="16" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="url(#gB)"/><path d="M40 42v44l16-16 16 16V42M80 42v44M80 86l12-16M80 86l-12-16" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      <br><span>16</span>
+    </div>
+  </div>
+</div>
+
+<!-- C: 极简文档 + M -->
+<div class="card">
+  <svg width="128" height="128" viewBox="0 0 128 128">
+    <defs>
+      <linearGradient id="gC" x1="0" y1="0" x2="0.5" y2="1">
+        <stop offset="0%" stop-color="#1e1e1e"/>
+        <stop offset="100%" stop-color="#374151"/>
+      </linearGradient>
+    </defs>
+    <rect width="128" height="128" rx="28" fill="url(#gC)"/>
+    <rect x="30" y="24" width="68" height="80" rx="8" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5"/>
+    <text x="64" y="78" text-anchor="middle" font-family="system-ui" font-size="42" font-weight="700" fill="white" opacity="0.95">md</text>
+  </svg>
+  <h3>C — Document Card (Dark)</h3>
+  <p>深色底 + 文档轮廓 + "md" 文字</p>
+  <div class="sizes">
+    <div>
+      <svg width="48" height="48" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="url(#gC)"/><rect x="30" y="24" width="68" height="80" rx="8" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5"/><text x="64" y="78" text-anchor="middle" font-family="system-ui" font-size="42" font-weight="700" fill="white" opacity="0.95">md</text></svg>
+      <br><span>48</span>
+    </div>
+    <div>
+      <svg width="16" height="16" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="url(#gC)"/><rect x="30" y="24" width="68" height="80" rx="8" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5"/><text x="64" y="78" text-anchor="middle" font-family="system-ui" font-size="42" font-weight="700" fill="white" opacity="0.95">md</text></svg>
+      <br><span>16</span>
+    </div>
+  </div>
+</div>
+
+<!-- D: 渐变圆角 + 抽象折叠 -->
+<div class="card">
+  <svg width="128" height="128" viewBox="0 0 128 128">
+    <defs>
+      <linearGradient id="gD" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c3aed"/>
+        <stop offset="50%" stop-color="#6366f1"/>
+        <stop offset="100%" stop-color="#3b82f6"/>
+      </linearGradient>
+    </defs>
+    <rect width="128" height="128" rx="28" fill="url(#gD)"/>
+    <!-- Abstract folded page -->
+    <path d="M38 28h32l22 22v50a8 8 0 01-8 8H38a8 8 0 01-8-8V36a8 8 0 018-8z" fill="rgba(255,255,255,0.2)"/>
+    <path d="M70 28v14a8 8 0 008 8h14" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+    <!-- Text lines -->
+    <line x1="42" y1="62" x2="78" y2="62" stroke="rgba(255,255,255,0.6)" stroke-width="3" stroke-linecap="round"/>
+    <line x1="42" y1="74" x2="70" y2="74" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round"/>
+    <line x1="42" y1="86" x2="60" y2="86" stroke="rgba(255,255,255,0.3)" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+  <h3>D — Folded Doc (Purple Gradient)</h3>
+  <p>紫色渐变 + 折角文档 + 文字行</p>
+  <div class="sizes">
+    <div>
+      <svg width="48" height="48" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="url(#gD)"/><path d="M38 28h32l22 22v50a8 8 0 01-8 8H38a8 8 0 01-8-8V36a8 8 0 018-8z" fill="rgba(255,255,255,0.2)"/><path d="M70 28v14a8 8 0 008 8h14" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/><line x1="42" y1="62" x2="78" y2="62" stroke="rgba(255,255,255,0.6)" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="74" x2="70" y2="74" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="86" x2="60" y2="86" stroke="rgba(255,255,255,0.3)" stroke-width="3" stroke-linecap="round"/></svg>
+      <br><span>48</span>
+    </div>
+    <div>
+      <svg width="16" height="16" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="url(#gD)"/><path d="M38 28h32l22 22v50a8 8 0 01-8 8H38a8 8 0 01-8-8V36a8 8 0 018-8z" fill="rgba(255,255,255,0.2)"/><path d="M70 28v14a8 8 0 008 8h14" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/><line x1="42" y1="62" x2="78" y2="62" stroke="rgba(255,255,255,0.6)" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="74" x2="70" y2="74" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="86" x2="60" y2="86" stroke="rgba(255,255,255,0.3)" stroke-width="3" stroke-linecap="round"/></svg>
+      <br><span>16</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
