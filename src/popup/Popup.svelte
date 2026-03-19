@@ -309,6 +309,7 @@
     max-height: 560px;
     overflow-y: auto;
     -webkit-font-smoothing: antialiased;
+    border-radius: 12px;
   }
 
   .popup::-webkit-scrollbar { width: 0; }
