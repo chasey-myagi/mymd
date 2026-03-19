@@ -1,10 +1,17 @@
 <script lang="ts">
   import { documentState } from '../stores/document'
   import { previewImageSrc } from '../stores/ui'
-  import { afterUpdate } from 'svelte'
+  import { afterUpdate, onMount } from 'svelte'
   import mermaid from 'mermaid'
 
   let contentEl: HTMLElement
+
+  onMount(() => {
+    contentEl.addEventListener('click', (e) => {
+      const img = (e.target as HTMLElement).closest('img')
+      if (img) previewImageSrc.set((img as HTMLImageElement).src)
+    })
+  })
 
   afterUpdate(() => {
     // Initialize Mermaid diagrams
@@ -13,12 +20,6 @@
       mermaid.initialize({ startOnLoad: false, theme: 'default' })
       mermaid.run({ nodes: mermaidEls as unknown as ArrayLike<HTMLElement> })
     }
-
-    // Wire image click handler for preview
-    contentEl?.querySelectorAll('img').forEach(img => {
-      img.style.cursor = 'zoom-in'
-      img.addEventListener('click', () => previewImageSrc.set(img.src))
-    })
 
     // Enhance code blocks: language label + copy button
     contentEl?.querySelectorAll('pre').forEach(pre => {
