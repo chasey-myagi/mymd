@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@mdit/plugin-alert": "^0.23.1",
-    "js-yaml": "^4.1.1",
     "@traptitech/markdown-it-katex": "^3.6.0",
+    "js-yaml": "^4.1.1",
     "katex": "^0.16.38",
     "markdown-it": "^14.1.1",
     "markdown-it-abbr": "^2.0.0",
@@ -28,14 +28,15 @@
     "markdown-it-table-of-contents": "^1.1.0",
     "markdown-it-task-lists": "^2.1.1",
     "mermaid": "^11.13.0",
+    "shiki": "^4.0.2",
     "svelte": "^4.2.20"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "2.4.0",
     "@sveltejs/vite-plugin-svelte": "^3.1.2",
     "@types/chrome": "^0.1.38",
-    "@types/katex": "^0.16.8",
     "@types/js-yaml": "^4.0.9",
+    "@types/katex": "^0.16.8",
     "@types/markdown-it": "^14.1.2",
     "jsdom": "^29.0.0",
     "svelte-check": "^4.4.5",

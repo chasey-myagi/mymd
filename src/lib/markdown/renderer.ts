@@ -1,5 +1,6 @@
 import MarkdownIt from 'markdown-it'
 import { full as emoji } from 'markdown-it-emoji'
+import { highlightCode } from './highlighter'
 import sup from 'markdown-it-sup'
 import sub from 'markdown-it-sub'
 import footnote from 'markdown-it-footnote'
@@ -60,4 +61,24 @@ export function createRenderer(): MarkdownIt {
   }
 
   return md
+}
+
+export async function renderMarkdown(markdown: string, codeTheme: string = 'github-dark'): Promise<string> {
+  const md = createRenderer()
+  let html = md.render(markdown)
+
+  // Post-process: replace <pre><code class="language-xxx"> with Shiki output
+  const codeBlockRegex = /<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g
+  const matches = [...html.matchAll(codeBlockRegex)]
+
+  for (const match of matches) {
+    const lang = match[1]
+    const code = match[2]
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&').replace(/&quot;/g, '"')
+    const highlighted = await highlightCode(code, lang, codeTheme)
+    html = html.replace(match[0], highlighted)
+  }
+
+  return html
 }
