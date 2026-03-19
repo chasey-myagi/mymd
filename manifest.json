@@ -29,5 +29,11 @@
     "file:///*",
     "http://*/*",
     "https://*/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/viewer/index.html"],
+      "matches": ["<all_urls>"]
+    }
   ]
 }
