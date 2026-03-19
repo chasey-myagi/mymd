@@ -1,0 +1,29 @@
+{
+  "name": "mymd",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "dependencies": {
+    "katex": "^0.16.38",
+    "markdown-it": "^14.1.1",
+    "mermaid": "^11.13.0",
+    "svelte": "^4.2.20"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "2.4.0",
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
+    "@types/chrome": "^0.1.38",
+    "@types/katex": "^0.16.8",
+    "@types/markdown-it": "^14.1.2",
+    "svelte-check": "^4.4.5",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21",
+    "vitest": "^1.6.1"
+  }
+}
