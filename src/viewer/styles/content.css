@@ -67,6 +67,8 @@
 }
 
 .sidebar-right {
+  width: 260px;
+  min-width: 200px;
   border-right: none;
   border-left: 1px solid var(--mymd-border);
 }
@@ -195,6 +197,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: block;
+  max-width: 100%;
   transition: background 0.1s, color 0.1s;
 }
 
@@ -292,13 +296,15 @@
 
 /* Paragraphs */
 .mymd-content p {
-  margin: 0.85em 0;
+  margin: 1em 0;
 }
 
 /* Links */
 .mymd-content a {
   color: var(--mymd-link);
   text-decoration: none;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
 
 .mymd-content a:hover {
@@ -313,7 +319,7 @@
 }
 
 .mymd-content li {
-  margin: 0.3em 0;
+  margin: 0.4em 0;
 }
 
 .mymd-content li > ul,
@@ -348,12 +354,13 @@
 
 /* Inline code */
 .mymd-content code {
-  font-family: var(--mymd-font-mono, ui-monospace, monospace);
+  font-family: var(--mymd-font-mono, ui-monospace, 'SF Mono', 'Cascadia Code', monospace);
   font-size: 0.875em;
   background: var(--mymd-code-bg);
   color: var(--mymd-code-text);
-  padding: 0.15em 0.4em;
+  padding: 0.2em 0.45em;
   border-radius: 4px;
+  word-break: break-word;
 }
 
 /* Code blocks */
@@ -362,10 +369,12 @@
 }
 
 .mymd-content pre {
-  margin: 1em 0;
+  margin: 1.2em 0;
+  padding: 1em 1.2em;
   border-radius: var(--mymd-radius, 6px);
   overflow: auto;
   background: var(--mymd-code-block-bg, var(--mymd-code-bg));
+  line-height: 1.5;
 }
 
 .mymd-content pre code {
@@ -374,6 +383,7 @@
   font-size: 0.875em;
   color: inherit;
   border-radius: 0;
+  word-break: normal;
 }
 
 /* Label and button are siblings of pre inside .pre-wrapper,

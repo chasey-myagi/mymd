@@ -146,6 +146,8 @@
     }
   }
 
+  $: isFileProtocol = $documentState.url.startsWith('file://')
+
   // Apply theme reactively
   $: {
     const mode = resolveColorMode($settings.colorMode)
@@ -186,7 +188,7 @@
     <ProgressBar />
   {/if}
   <div class="layout">
-    {#if $showFileList}
+    {#if $showFileList && isFileProtocol}
       <aside class="sidebar sidebar-left">
         <FileList />
       </aside>

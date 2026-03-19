@@ -39,7 +39,7 @@
         class:active={heading.id === activeId}
         style="padding-left: {(heading.level - 1) * 12 + 8}px"
       >
-        <button on:click={() => scrollTo(heading.id)}>
+        <button title={heading.text} on:click={() => scrollTo(heading.id)}>
           {heading.text}
         </button>
       </li>
