@@ -4,6 +4,7 @@
   import { getTheme, getThemeNames } from '../lib/theme/themes/index'
   import { resolveColorMode, applyTheme, exportTheme, importTheme } from '../lib/theme/engine'
   import { DEFAULT_SETTINGS, type MymdSettings } from '../types'
+  import { t } from '../lib/i18n'
 
   let settings: MymdSettings = { ...DEFAULT_SETTINGS }
   let isLoaded = false
@@ -141,13 +142,24 @@
         on:click={() => (showAppearance = !showAppearance)}
         aria-expanded={showAppearance}
       >
-        <span class="section-title">Appearance</span>
+        <span class="section-title">{t('appearance', settings.language)}</span>
         <span class="chevron" class:open={showAppearance}>›</span>
       </button>
       {#if showAppearance}
         <div class="section-body">
           <div class="row">
-            <span class="label">Theme</span>
+            <span class="label">{t('language', settings.language)}</span>
+            <select
+              class="select"
+              bind:value={settings.language}
+              on:change={persist}
+            >
+              <option value="zh">中文</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div class="row">
+            <span class="label">{t('theme', settings.language)}</span>
             <select
               class="select"
               bind:value={settings.theme}
@@ -159,7 +171,7 @@
             </select>
           </div>
           <div class="row">
-            <span class="label">Mode</span>
+            <span class="label">{t('mode', settings.language)}</span>
             <div class="mode-group">
               <button
                 class="mode-btn"
@@ -188,19 +200,19 @@
             </div>
           </div>
           <div class="row">
-            <span class="label">Font</span>
+            <span class="label">{t('fontFamily', settings.language)}</span>
             <select
               class="select"
               bind:value={settings.fontFamily}
               on:change={persist}
             >
-              <option value="system-ui, sans-serif">System Sans</option>
-              <option value="Georgia, serif">Serif</option>
-              <option value="ui-monospace, monospace">Monospace</option>
+              <option value="system-ui, sans-serif">{t('systemSans', settings.language)}</option>
+              <option value="Georgia, serif">{t('serif', settings.language)}</option>
+              <option value="ui-monospace, monospace">{t('monospace', settings.language)}</option>
             </select>
           </div>
           <div class="row">
-            <span class="label">Font Size</span>
+            <span class="label">{t('fontSize', settings.language)}</span>
             <div class="stepper">
               <button
                 class="step-btn"
@@ -216,7 +228,7 @@
             </div>
           </div>
           <div class="row">
-            <span class="label">Line Height</span>
+            <span class="label">{t('lineHeight', settings.language)}</span>
             <div class="stepper">
               <button
                 class="step-btn"
@@ -232,7 +244,7 @@
             </div>
           </div>
           <div class="row">
-            <span class="label">Width</span>
+            <span class="label">{t('width', settings.language)}</span>
             <div class="stepper">
               <button
                 class="step-btn"
@@ -258,13 +270,13 @@
         on:click={() => (showFeatures = !showFeatures)}
         aria-expanded={showFeatures}
       >
-        <span class="section-title">Features</span>
+        <span class="section-title">{t('features', settings.language)}</span>
         <span class="chevron" class:open={showFeatures}>›</span>
       </button>
       {#if showFeatures}
         <div class="section-body">
           <div class="row">
-            <span class="label">Auto Outline</span>
+            <span class="label">{t('autoOutline', settings.language)}</span>
             <button
               class="toggle"
               class:on={settings.showOutline}
@@ -274,7 +286,7 @@
             ><span class="thumb" /></button>
           </div>
           <div class="row">
-            <span class="label">Auto Refresh</span>
+            <span class="label">{t('autoRefresh', settings.language)}</span>
             <button
               class="toggle"
               class:on={settings.autoRefresh}
@@ -284,7 +296,7 @@
             ><span class="thumb" /></button>
           </div>
           <div class="row">
-            <span class="label">Progress Bar</span>
+            <span class="label">{t('progressBar', settings.language)}</span>
             <button
               class="toggle"
               class:on={settings.showProgressBar}
@@ -294,7 +306,7 @@
             ><span class="thumb" /></button>
           </div>
           <div class="row">
-            <span class="label">Stats</span>
+            <span class="label">{t('stats', settings.language)}</span>
             <button
               class="toggle"
               class:on={settings.showStats}
@@ -304,7 +316,7 @@
             ><span class="thumb" /></button>
           </div>
           <div class="row">
-            <span class="label">Frontmatter</span>
+            <span class="label">{t('frontmatter', settings.language)}</span>
             <button
               class="toggle"
               class:on={settings.showFrontmatter}
@@ -314,7 +326,7 @@
             ><span class="thumb" /></button>
           </div>
           <div class="row">
-            <span class="label">Remember Scroll</span>
+            <span class="label">{t('rememberScroll', settings.language)}</span>
             <button
               class="toggle"
               class:on={settings.rememberScrollPosition}
@@ -334,12 +346,12 @@
         on:click={() => (showAdvanced = !showAdvanced)}
         aria-expanded={showAdvanced}
       >
-        <span class="section-title">Advanced</span>
+        <span class="section-title">{t('advanced', settings.language)}</span>
         <span class="chevron" class:open={showAdvanced}>›</span>
       </button>
       {#if showAdvanced}
         <div class="section-body advanced-body">
-          <div class="subsection-label">CSS Variables</div>
+          <div class="subsection-label">{t('cssVariables', settings.language)}</div>
           <div class="var-grid">
             {#each topVariables as [varName, label]}
               <div class="var-row">
@@ -355,7 +367,7 @@
             {/each}
           </div>
 
-          <div class="subsection-label" style="margin-top: 10px;">Custom CSS</div>
+          <div class="subsection-label" style="margin-top: 10px;">{t('customCSS', settings.language)}</div>
           <textarea
             class="css-textarea"
             bind:value={settings.customCSS}
@@ -367,11 +379,11 @@
           <div class="import-export-row">
             <button class="action-btn ghost small" on:click={handleImport}>
               <svg class="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2v8m-3-3 3 3 3-3"/><path d="M3 13h10"/></svg>
-              Import
+              {t('importTheme', settings.language)}
             </button>
             <button class="action-btn ghost small" on:click={handleExport}>
               <svg class="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 10V2m-3 3 3-3 3 3"/><path d="M3 13h10"/></svg>
-              Export
+              {t('exportTheme', settings.language)}
             </button>
           </div>
         </div>
@@ -382,11 +394,11 @@
     <footer class="footer">
       <button class="action-btn primary" on:click={openFullSettings}>
         <svg class="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h12M2 8h12M2 13h12"/><circle cx="5" cy="3" r="1.5" fill="currentColor" stroke="none"/><circle cx="11" cy="8" r="1.5" fill="currentColor" stroke="none"/><circle cx="7" cy="13" r="1.5" fill="currentColor" stroke="none"/></svg>
-        Open Viewer
+        {t('openViewer', settings.language)}
       </button>
       <button class="action-btn ghost" on:click={openTestPage}>
         <svg class="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 9v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4"/><path d="M9 2h5v5M14 2 7 9"/></svg>
-        Test Page
+        {t('openTestPage', settings.language)}
       </button>
     </footer>
   </div>

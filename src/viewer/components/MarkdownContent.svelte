@@ -1,7 +1,10 @@
 <script lang="ts">
   import { documentState } from '../stores/document'
   import { previewImageSrc } from '../stores/ui'
+  import { settings } from '../stores/settings'
   import { afterUpdate, onMount } from 'svelte'
+  import { get } from 'svelte/store'
+  import { t } from '../../lib/i18n'
   import mermaid from 'mermaid'
 
   let contentEl: HTMLElement
@@ -48,14 +51,15 @@
       // Copy button
       const btn = document.createElement('button')
       btn.className = 'code-copy-btn'
-      btn.textContent = 'Copy'
+      btn.textContent = t('copy', get(settings).language)
       btn.addEventListener('click', () => {
         const text = code.textContent ?? ''
         navigator.clipboard.writeText(text).then(() => {
-          btn.textContent = 'Copied!'
+          const lang = get(settings).language
+          btn.textContent = t('copied', lang)
           btn.classList.add('copied')
           setTimeout(() => {
-            btn.textContent = 'Copy'
+            btn.textContent = t('copy', get(settings).language)
             btn.classList.remove('copied')
           }, 2000)
         })

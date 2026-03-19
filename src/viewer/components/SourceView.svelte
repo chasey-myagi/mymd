@@ -1,8 +1,11 @@
 <script lang="ts">
   import { documentState } from '../stores/document'
+  import { settings } from '../stores/settings'
+  import { t } from '../../lib/i18n'
 
   let copied = false
 
+  $: lang = $settings.language
   $: lines = $documentState.rawMarkdown.split('\n')
   $: fileName = decodeURIComponent($documentState.url.split('/').pop() ?? 'source')
 
@@ -18,9 +21,9 @@
   <header class="source-header">
     <span class="source-filename">{fileName}</span>
     <div class="source-actions">
-      <span class="source-line-count">{lines.length} lines</span>
+      <span class="source-line-count">{lines.length} {t('lines', lang)}</span>
       <button class="source-copy-btn" class:copied on:click={copyAll}>
-        {copied ? '✓ Copied' : 'Copy All'}
+        {copied ? `✓ ${t('copied', lang)}` : t('copyAll', lang)}
       </button>
     </div>
   </header>

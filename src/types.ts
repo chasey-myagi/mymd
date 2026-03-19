@@ -16,6 +16,7 @@ export interface MymdSettings {
   rememberScrollPosition: boolean
   showFrontmatter: boolean
   shortcuts: Record<string, string>
+  language: 'zh' | 'en'
 }
 
 export interface MymdTheme {
@@ -70,4 +71,5 @@ export const DEFAULT_SETTINGS: MymdSettings = {
     toggleSource: 'Ctrl+Shift+S',
     toggleDark: 'Ctrl+Shift+D',
   },
+  language: 'zh',
 }

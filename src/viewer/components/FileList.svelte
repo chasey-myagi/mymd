@@ -1,7 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte'
   import { documentState } from '../stores/document'
+  import { settings } from '../stores/settings'
   import { parseDirectoryListing } from '../../lib/file-list'
+  import { t } from '../../lib/i18n'
 
   const dispatch = createEventDispatcher()
   let files: string[] = []
@@ -39,7 +41,7 @@
     {/each}
   </ul>
 {:else if isFileProtocol}
-  <div class="empty-state">当前目录暂无其他 .md 文件</div>
+  <div class="empty-state">{t('noFiles', $settings.language)}</div>
 {/if}
 
 <style>
