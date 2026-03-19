@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
   import { documentState, headings } from '../stores/document'
-  import { showSettings, showSource } from '../stores/ui'
+  import { showSource } from '../stores/ui'
   import { settings } from '../stores/settings'
+  import { t } from '../../lib/i18n'
   import Outline from './Outline.svelte'
   import FileList from './FileList.svelte'
 
@@ -14,7 +15,8 @@
   let closeTimer: ReturnType<typeof setTimeout>
 
   $: fileName = decodeURIComponent($documentState.url.split('/').pop() ?? '')
-  $: stats = `${$documentState.wordCount} 字 · ${$documentState.readingTime} 分钟`
+  $: lang = $settings.language
+  $: stats = `${$documentState.wordCount} ${t('words', lang)} · ${$documentState.readingTime} ${t('minutes', lang)}`
   $: isFileProtocol = $documentState.url.startsWith('file://')
   $: hasOutline = $headings.length > 0
 
@@ -67,8 +69,8 @@
     <button
       class="pill-handle"
       on:click={toggle}
-      title="打开面板"
-      aria-label="打开文档面板"
+      title={t('openPanel', lang)}
+      aria-label={t('docPanel', lang)}
       aria-expanded="false"
     >
       <span>☰</span>
@@ -80,7 +82,7 @@
       class="pill-panel"
       class:is-closing={isClosing}
       role="dialog"
-      aria-label="文档面板"
+      aria-label={t('docPanel', lang)}
     >
       <!-- Glass specular highlight -->
       <div class="glass-sheen" aria-hidden="true"></div>
@@ -93,7 +95,7 @@
             <p class="pill-stats">{stats}</p>
           {/if}
         </div>
-        <button class="pill-close" on:click={close} aria-label="关闭 (Esc)" title="关闭 (Esc)">✕</button>
+        <button class="pill-close" on:click={close} aria-label="{t('close', lang)} (Esc)" title="{t('close', lang)} (Esc)">✕</button>
       </div>
 
       <!-- Connected pill tab switcher -->
@@ -105,7 +107,7 @@
           aria-selected={activeTab === 'outline'}
           on:click={() => activeTab = 'outline'}
         >
-          ☰ 目录
+          ☰ {t('outline', lang)}
         </button>
         <button
           role="tab"
@@ -115,7 +117,7 @@
           disabled={!isFileProtocol}
           on:click={() => activeTab = 'files'}
         >
-          ⊞ 文件{#if fileCount > 0}<span class="pill-badge">{fileCount}</span>{/if}
+          ⊞ {t('files', lang)}{#if fileCount > 0}<span class="pill-badge">{fileCount}</span>{/if}
         </button>
       </div>
 
@@ -125,7 +127,7 @@
           {#if hasOutline}
             <Outline />
           {:else}
-            <div class="pill-empty">暂无标题</div>
+            <div class="pill-empty">{t('noHeadings', lang)}</div>
           {/if}
         </div>
         <div class:hidden={activeTab !== 'files'}>
@@ -139,17 +141,10 @@
           class="pill-action"
           class:is-on={$showSource}
           on:click={() => $showSource = !$showSource}
-          title="切换源码视图"
+          title={t('source', lang)}
           aria-pressed={$showSource}
         >
-          &lt;/&gt; 源码
-        </button>
-        <button
-          class="pill-action pill-action-icon"
-          on:click={() => $showSettings = true}
-          title="设置"
-        >
-          ⚙
+          &lt;/&gt; {t('source', lang)}
         </button>
       </div>
     </div>

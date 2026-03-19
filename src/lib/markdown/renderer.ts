@@ -18,6 +18,18 @@ import { mermaidPlugin } from './plugins/mermaid'
 import { wikilinkPlugin } from './plugins/wikilink'
 import DOMPurify from 'dompurify'
 
+// Register DOMPurify hook once at module level to allow Shiki's color styles on <span>
+DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
+  if (data.attrName === 'style' && node.tagName === 'SPAN') {
+    const clean = data.attrValue
+      .split(';')
+      .filter(s => /^\s*(color|background-color)\s*:/.test(s))
+      .join(';')
+    data.attrValue = clean
+    data.forceKeepAttr = true
+  }
+})
+
 export function createRenderer(): MarkdownIt {
   const md = new MarkdownIt({
     html: true,
@@ -87,23 +99,10 @@ export async function renderMarkdown(markdown: string, codeTheme: string = 'gith
     html = html.replace(match[0], () => highlighted)
   }
 
-  DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
-    if (data.attrName === 'style' && node.tagName === 'SPAN') {
-      const clean = data.attrValue
-        .split(';')
-        .filter(s => /^\s*(color|background-color)\s*:/.test(s))
-        .join(';')
-      data.attrValue = clean
-      data.forceKeepAttr = true
-    }
-  })
-
   html = DOMPurify.sanitize(html, {
     ADD_TAGS: ['math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'msub', 'mfrac', 'msqrt', 'mover', 'munder', 'munderover', 'mtable', 'mtr', 'mtd', 'annotation'],
     ADD_ATTR: ['xmlns', 'encoding', 'class', 'id', 'href', 'target', 'rel'],
   })
-
-  DOMPurify.removeHook('uponSanitizeAttribute')
 
   return html
 }
