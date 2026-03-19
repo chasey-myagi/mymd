@@ -66,6 +66,16 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message.type === 'LIST_DIRECTORY') {
+    try {
+      const url = new URL(message.url)
+      if (url.protocol !== 'file:') {
+        sendResponse({ success: false, error: 'Only file:// URLs allowed' })
+        return true
+      }
+    } catch {
+      sendResponse({ success: false, error: 'Invalid URL' })
+      return true
+    }
     // Fetch directory listing for file:// sidebar
     fetch(message.url)
       .then(res => res.text())

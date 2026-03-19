@@ -84,13 +84,26 @@ export async function renderMarkdown(markdown: string, codeTheme: string = 'gith
       .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
       .replace(/&amp;/g, '&').replace(/&quot;/g, '"')
     const highlighted = await highlightCode(code, lang, codeTheme)
-    html = html.replace(match[0], highlighted)
+    html = html.replace(match[0], () => highlighted)
   }
+
+  DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
+    if (data.attrName === 'style' && node.tagName === 'SPAN') {
+      const clean = data.attrValue
+        .split(';')
+        .filter(s => /^\s*(color|background-color)\s*:/.test(s))
+        .join(';')
+      data.attrValue = clean
+      data.forceKeepAttr = true
+    }
+  })
 
   html = DOMPurify.sanitize(html, {
     ADD_TAGS: ['math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'msub', 'mfrac', 'msqrt', 'mover', 'munder', 'munderover', 'mtable', 'mtr', 'mtd', 'annotation'],
-    ADD_ATTR: ['xmlns', 'encoding', 'class', 'style', 'id', 'href', 'target', 'rel'],
+    ADD_ATTR: ['xmlns', 'encoding', 'class', 'id', 'href', 'target', 'rel'],
   })
+
+  DOMPurify.removeHook('uponSanitizeAttribute')
 
   return html
 }
