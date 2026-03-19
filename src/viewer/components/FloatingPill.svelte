@@ -18,8 +18,19 @@
   $: isFileProtocol = $documentState.url.startsWith('file://')
   $: hasOutline = $headings.length > 0
 
-  function toggle() { if (expanded) close(); else expanded = true }
+  let justOpened = false
+
+  function toggle() {
+    if (expanded) {
+      close()
+    } else {
+      expanded = true
+      justOpened = true
+      setTimeout(() => { justOpened = false }, 300)
+    }
+  }
   function close() {
+    if (justOpened) return  // prevent immediate close from same click
     isClosing = true
     clearTimeout(closeTimer)
     closeTimer = setTimeout(() => { expanded = false; isClosing = false }, 160)
@@ -31,6 +42,7 @@
   }
 
   function handleClickOutside(e: MouseEvent) {
+    if (justOpened) return
     if (expanded && pillEl && !pillEl.contains(e.target as Node)) close()
   }
   function handleKeydown(e: KeyboardEvent) {
@@ -162,15 +174,15 @@
     width: 36px;
     height: 80px;
     border-radius: 18px;
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.82);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 0.5px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow:
-      0 8px 32px rgba(0,0,0,0.08),
-      inset 0 0 0 0.5px rgba(255,255,255,0.3);
+      0 4px 16px rgba(0,0,0,0.10),
+      0 1px 3px rgba(0,0,0,0.06);
     cursor: pointer;
-    color: rgba(0,0,0,0.45);
+    color: rgba(0,0,0,0.55);
     font-size: 0.9375rem;
     padding: 0;
     animation: breathe 6s ease-in-out infinite;
@@ -180,15 +192,16 @@
   .pill-handle:hover {
     animation-play-state: paused;
     opacity: 1;
-    color: rgba(0,0,0,0.75);
+    color: rgba(0,0,0,0.8);
     box-shadow:
-      0 12px 40px rgba(0,0,0,0.12),
-      inset 0 0 0 0.5px rgba(255,255,255,0.4);
+      0 8px 24px rgba(0,0,0,0.14),
+      0 2px 6px rgba(0,0,0,0.08);
+    border-color: rgba(0, 0, 0, 0.12);
   }
 
   @keyframes breathe {
-    0%, 100% { opacity: 0.45; }
-    50%       { opacity: 0.65; }
+    0%, 100% { opacity: 0.6; }
+    50%       { opacity: 0.85; }
   }
 
   /* ─── Expanded glass panel ───────────────────── */
@@ -197,13 +210,13 @@
     width: 280px;
     max-height: calc(80vh);
     border-radius: 20px;
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 0.5px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow:
-      0 8px 32px rgba(0,0,0,0.08),
-      inset 0 0 0 0.5px rgba(255,255,255,0.3);
+      0 8px 32px rgba(0,0,0,0.12),
+      0 2px 6px rgba(0,0,0,0.06);
     display: flex;
     flex-direction: column;
     overflow: hidden;
