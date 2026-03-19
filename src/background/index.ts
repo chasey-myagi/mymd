@@ -45,6 +45,16 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   if (message.type === 'FETCH_URL') {
     // Viewer requests content fetch for http/https
+    try {
+      const url = new URL(message.url)
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        sendResponse({ success: false, error: 'Only HTTP/HTTPS URLs allowed' })
+        return true
+      }
+    } catch {
+      sendResponse({ success: false, error: 'Invalid URL' })
+      return true
+    }
     fetch(message.url)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`)

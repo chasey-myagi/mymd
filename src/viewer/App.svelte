@@ -30,6 +30,7 @@
   let mainContent: HTMLElement
   let refreshInterval: ReturnType<typeof setInterval>
   let scrollSaveTimeout: ReturnType<typeof setTimeout>
+  let unsubSettings: () => void
 
   function extractHeadings(html: string): Heading[] {
     const parser = new DOMParser()
@@ -49,8 +50,11 @@
     const hasChromeApi = typeof chrome !== 'undefined' && chrome.runtime?.sendMessage
 
     if (url.startsWith('file://') && hasChromeApi) {
-      const result = await chrome.storage.session.get(`file_content_${url}`)
-      return result[`file_content_${url}`] ?? ''
+      const key = `file_content_${url}`
+      const result = await chrome.storage.session.get(key)
+      const content = result[key] ?? ''
+      chrome.storage.session.remove(key).catch(() => {})
+      return content
     }
 
     if (hasChromeApi) {
@@ -99,7 +103,8 @@
   function handleScroll() {
     if (!mainContent) return
     const { scrollTop, scrollHeight, clientHeight } = mainContent
-    $scrollProgress = Math.round((scrollTop / (scrollHeight - clientHeight)) * 100)
+    const max = scrollHeight - clientHeight
+    $scrollProgress = max > 0 ? Math.round((scrollTop / max) * 100) : 0
     debouncedSaveScroll()
   }
 
@@ -162,7 +167,7 @@
     }
 
     startAutoRefresh()
-    settings.subscribe(() => startAutoRefresh())
+    unsubSettings = settings.subscribe(() => startAutoRefresh())
     document.addEventListener('keydown', handleKeydown)
   })
 
@@ -170,6 +175,7 @@
     document.removeEventListener('keydown', handleKeydown)
     if (refreshInterval) clearInterval(refreshInterval)
     clearTimeout(scrollSaveTimeout)
+    unsubSettings?.()
   })
 </script>
 

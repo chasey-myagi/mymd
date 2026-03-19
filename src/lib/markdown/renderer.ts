@@ -16,6 +16,7 @@ import { alert } from '@mdit/plugin-alert'
 import katex from '@traptitech/markdown-it-katex'
 import { mermaidPlugin } from './plugins/mermaid'
 import { wikilinkPlugin } from './plugins/wikilink'
+import DOMPurify from 'dompurify'
 
 export function createRenderer(): MarkdownIt {
   const md = new MarkdownIt({
@@ -43,16 +44,20 @@ export function createRenderer(): MarkdownIt {
     .use(mermaidPlugin)
     .use(wikilinkPlugin)
 
-  // Add heading IDs for anchor links
+  // Add heading IDs for anchor links (with per-render deduplication via env)
   const defaultHeadingOpen = md.renderer.rules.heading_open
   md.renderer.rules.heading_open = (tokens, idx, options, env, self) => {
+    if (!env.usedIds) env.usedIds = new Map<string, number>()
     const token = tokens[idx]
     const contentToken = tokens[idx + 1]
     const text = contentToken.children
       ?.filter(t => t.type === 'text' || t.type === 'code_inline')
       .map(t => t.content)
       .join('') ?? ''
-    const id = text.toLowerCase().replace(/[^\w\u4e00-\u9fff]+/g, '-').replace(/^-|-$/g, '')
+    let id = text.toLowerCase().replace(/[^\w\u4e00-\u9fff]+/g, '-').replace(/^-|-$/g, '')
+    const count = env.usedIds.get(id) ?? 0
+    env.usedIds.set(id, count + 1)
+    if (count > 0) id = `${id}-${count}`
     token.attrSet('id', id)
     if (defaultHeadingOpen) {
       return defaultHeadingOpen(tokens, idx, options, env, self)
@@ -63,12 +68,14 @@ export function createRenderer(): MarkdownIt {
   return md
 }
 
+let cachedMd: MarkdownIt | null = null
+
 export async function renderMarkdown(markdown: string, codeTheme: string = 'github-dark'): Promise<string> {
-  const md = createRenderer()
-  let html = md.render(markdown)
+  if (!cachedMd) cachedMd = createRenderer()
+  let html = cachedMd.render(markdown)
 
   // Post-process: replace <pre><code class="language-xxx"> with Shiki output
-  const codeBlockRegex = /<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g
+  const codeBlockRegex = /<pre><code class="language-([\w+#.-]+)">([\s\S]*?)<\/code><\/pre>/g
   const matches = [...html.matchAll(codeBlockRegex)]
 
   for (const match of matches) {
@@ -79,6 +86,11 @@ export async function renderMarkdown(markdown: string, codeTheme: string = 'gith
     const highlighted = await highlightCode(code, lang, codeTheme)
     html = html.replace(match[0], highlighted)
   }
+
+  html = DOMPurify.sanitize(html, {
+    ADD_TAGS: ['math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'msub', 'mfrac', 'msqrt', 'mover', 'munder', 'munderover', 'mtable', 'mtr', 'mtd', 'annotation'],
+    ADD_ATTR: ['xmlns', 'encoding', 'class', 'style', 'id', 'href', 'target', 'rel'],
+  })
 
   return html
 }
