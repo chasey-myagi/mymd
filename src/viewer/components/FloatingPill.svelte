@@ -43,20 +43,14 @@
     if (!hasOutline && fileCount > 0) activeTab = 'files'
   }
 
-  function handleClickOutside(e: MouseEvent) {
-    if (justOpened) return
-    if (expanded && pillEl && !pillEl.contains(e.target as Node)) close()
-  }
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Escape' && expanded) close()
   }
 
   onMount(() => {
-    document.addEventListener('click', handleClickOutside)
     document.addEventListener('keydown', handleKeydown)
   })
   onDestroy(() => {
-    document.removeEventListener('click', handleClickOutside)
     document.removeEventListener('keydown', handleKeydown)
     clearTimeout(closeTimer)
   })
