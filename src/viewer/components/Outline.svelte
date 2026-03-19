@@ -30,19 +30,52 @@
   }
 </script>
 
-<nav class="outline">
-  <h3 class="outline-title">Outline</h3>
-  <ul class="outline-list">
-    {#each $headings as heading}
-      <li
-        class="outline-item"
-        class:active={heading.id === activeId}
-        style="padding-left: {(heading.level - 1) * 12 + 8}px"
-      >
-        <button title={heading.text} on:click={() => scrollTo(heading.id)}>
-          {heading.text}
-        </button>
-      </li>
-    {/each}
-  </ul>
-</nav>
+<ul class="outline-list">
+  {#each $headings as heading}
+    <li
+      class="outline-item"
+      class:active={heading.id === activeId}
+      style="padding-left: {(heading.level - 1) * 12 + 8}px"
+    >
+      <button title={heading.text} on:click={() => scrollTo(heading.id)}>
+        {heading.text}
+      </button>
+    </li>
+  {/each}
+</ul>
+
+<style>
+  .outline-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .outline-item button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    padding: 3px 8px;
+    font-size: 0.8rem;
+    color: var(--mymd-text-muted);
+    border-radius: var(--mymd-radius-sm, 4px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    max-width: 100%;
+    transition: background 0.1s, color 0.1s;
+  }
+
+  .outline-item.active button {
+    color: var(--mymd-link);
+    background: color-mix(in srgb, var(--mymd-link) 10%, transparent);
+  }
+
+  .outline-item button:hover {
+    background: var(--mymd-hover);
+    color: var(--mymd-text);
+  }
+</style>
