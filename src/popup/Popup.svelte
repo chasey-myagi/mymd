@@ -310,12 +310,6 @@
     width: 340px;
     max-height: 552px;
     -webkit-font-smoothing: antialiased;
-    border-radius: 12px;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.12),
-      0 2px 8px rgba(0, 0, 0, 0.06),
-      0 0 0 1px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
   }
 
   .popup-scroll {
