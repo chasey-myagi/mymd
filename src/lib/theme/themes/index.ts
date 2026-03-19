@@ -1,0 +1,28 @@
+import type { MymdTheme } from '../../../types'
+import { githubLight, githubDark } from './github'
+import { typoraLight, typoraDark } from './typora'
+import { academicLight, academicDark } from './academic'
+import { readerLight, readerDark } from './reader'
+import { minimalLight, minimalDark } from './minimal'
+
+export interface ThemePair {
+  light: MymdTheme
+  dark: MymdTheme
+}
+
+export const THEMES: Record<string, ThemePair> = {
+  github: { light: githubLight, dark: githubDark },
+  typora: { light: typoraLight, dark: typoraDark },
+  academic: { light: academicLight, dark: academicDark },
+  reader: { light: readerLight, dark: readerDark },
+  minimal: { light: minimalLight, dark: minimalDark },
+}
+
+export function getTheme(name: string, mode: 'light' | 'dark'): MymdTheme {
+  const pair = THEMES[name] ?? THEMES.github
+  return pair[mode]
+}
+
+export function getThemeNames(): string[] {
+  return Object.keys(THEMES)
+}
