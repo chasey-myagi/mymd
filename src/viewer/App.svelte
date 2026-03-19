@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
-  import Toolbar from './components/Toolbar.svelte'
+  import FloatingPill from './components/FloatingPill.svelte'
   import MarkdownContent from './components/MarkdownContent.svelte'
   import ProgressBar from './components/ProgressBar.svelte'
   import ScrollTop from './components/ScrollTop.svelte'
@@ -166,7 +166,6 @@
 {#if error}
   <ErrorPage {error} type={errorType} />
 {:else}
-  <Toolbar />
   {#if $settings.showProgressBar}
     <ProgressBar />
   {/if}
@@ -191,6 +190,7 @@
     {/if}
   </div>
   <ScrollTop />
+  <FloatingPill />
   <SettingsPanel />
   <ImagePreview />
 {/if}
