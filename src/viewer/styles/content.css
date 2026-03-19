@@ -1,0 +1,347 @@
+/* Toolbar */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  height: 44px;
+  background: var(--mymd-toolbar-bg, var(--mymd-surface));
+  border-bottom: 1px solid var(--mymd-border);
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--mymd-text);
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toolbar-stats {
+  font-size: 0.8rem;
+  color: var(--mymd-text-muted);
+}
+
+.toolbar-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--mymd-text-muted);
+  font-size: 1rem;
+  transition: background 0.15s, color 0.15s;
+}
+
+.toolbar-btn:hover {
+  background: var(--mymd-hover);
+  color: var(--mymd-text);
+}
+
+/* Layout */
+.layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  border-right: 1px solid var(--mymd-border);
+  background: var(--mymd-surface);
+}
+
+.sidebar-right {
+  border-right: none;
+  border-left: 1px solid var(--mymd-border);
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px max(24px, calc((100% - var(--mymd-content-width, 800px)) / 2));
+  scroll-behavior: smooth;
+}
+
+/* Progress bar */
+.progress-bar {
+  height: 3px;
+  background: var(--mymd-border);
+  flex-shrink: 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--mymd-link);
+  transition: width 0.1s ease;
+}
+
+/* Scroll to top */
+.scroll-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--mymd-link);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--mymd-shadow);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.scroll-top:hover {
+  transform: translateY(-2px);
+}
+
+/* Error page */
+.error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  padding: 32px;
+  text-align: center;
+  color: var(--mymd-text);
+}
+
+.error-page h1 {
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.error-page p {
+  color: var(--mymd-text-muted);
+  max-width: 480px;
+}
+
+.error-page button {
+  padding: 8px 20px;
+  background: var(--mymd-link);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+/* Source view */
+.source-view {
+  font-family: var(--mymd-font-mono, monospace);
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--mymd-text);
+}
+
+/* Markdown content */
+.mymd-content {
+  max-width: var(--mymd-content-width, 800px);
+  margin: 0 auto;
+  color: var(--mymd-text);
+  line-height: var(--mymd-line-height, 1.6);
+}
+
+.mymd-content h1,
+.mymd-content h2,
+.mymd-content h3,
+.mymd-content h4,
+.mymd-content h5,
+.mymd-content h6 {
+  color: var(--mymd-heading);
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 1.5em 0 0.5em;
+}
+
+.mymd-content h1 { font-size: 2em; border-bottom: 1px solid var(--mymd-border); padding-bottom: 0.3em; }
+.mymd-content h2 { font-size: 1.5em; border-bottom: 1px solid var(--mymd-border); padding-bottom: 0.25em; }
+.mymd-content h3 { font-size: 1.25em; }
+.mymd-content h4 { font-size: 1em; }
+.mymd-content h5 { font-size: 0.875em; }
+.mymd-content h6 { font-size: 0.85em; color: var(--mymd-text-muted); }
+
+.mymd-content p {
+  margin: 0.75em 0;
+}
+
+.mymd-content a {
+  color: var(--mymd-link);
+  text-decoration: none;
+}
+
+.mymd-content a:hover {
+  text-decoration: underline;
+}
+
+.mymd-content ul,
+.mymd-content ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.mymd-content li {
+  margin: 0.25em 0;
+}
+
+.mymd-content blockquote {
+  border-left: 4px solid var(--mymd-border);
+  padding: 0.5em 1em;
+  color: var(--mymd-text-muted);
+  margin: 1em 0;
+  background: var(--mymd-surface);
+  border-radius: 0 4px 4px 0;
+}
+
+.mymd-content code {
+  font-family: var(--mymd-font-mono, monospace);
+  font-size: 0.875em;
+  background: var(--mymd-code-bg);
+  color: var(--mymd-code-text);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+
+.mymd-content pre {
+  margin: 1em 0;
+  border-radius: var(--mymd-radius);
+  overflow: auto;
+}
+
+.mymd-content pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.875em;
+  color: inherit;
+}
+
+.mymd-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 0.9em;
+}
+
+.mymd-content th,
+.mymd-content td {
+  border: 1px solid var(--mymd-border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.mymd-content th {
+  background: var(--mymd-surface);
+  font-weight: 600;
+}
+
+.mymd-content tr:hover {
+  background: var(--mymd-hover);
+}
+
+.mymd-content hr {
+  border: none;
+  border-top: 1px solid var(--mymd-border);
+  margin: 2em 0;
+}
+
+.mymd-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--mymd-radius);
+}
+
+/* Task list checkboxes */
+.mymd-content .task-list-item {
+  list-style: none;
+  margin-left: -1.5em;
+}
+
+.mymd-content .task-list-item input {
+  margin-right: 0.5em;
+}
+
+/* Footnotes */
+.mymd-content .footnotes {
+  margin-top: 2em;
+  padding-top: 1em;
+  border-top: 1px solid var(--mymd-border);
+  font-size: 0.875em;
+  color: var(--mymd-text-muted);
+}
+
+/* Alert boxes */
+.mymd-content .markdown-alert {
+  padding: 0.75em 1em;
+  border-left: 4px solid;
+  border-radius: 0 var(--mymd-radius) var(--mymd-radius) 0;
+  margin: 1em 0;
+}
+
+.mymd-content .markdown-alert.markdown-alert-note {
+  border-color: var(--mymd-alert-note);
+  background: color-mix(in srgb, var(--mymd-alert-note) 10%, transparent);
+}
+
+.mymd-content .markdown-alert.markdown-alert-tip {
+  border-color: var(--mymd-alert-tip);
+  background: color-mix(in srgb, var(--mymd-alert-tip) 10%, transparent);
+}
+
+.mymd-content .markdown-alert.markdown-alert-important {
+  border-color: var(--mymd-alert-important);
+  background: color-mix(in srgb, var(--mymd-alert-important) 10%, transparent);
+}
+
+.mymd-content .markdown-alert.markdown-alert-warning {
+  border-color: var(--mymd-alert-warning);
+  background: color-mix(in srgb, var(--mymd-alert-warning) 10%, transparent);
+}
+
+.mymd-content .markdown-alert.markdown-alert-caution {
+  border-color: var(--mymd-alert-caution);
+  background: color-mix(in srgb, var(--mymd-alert-caution) 10%, transparent);
+}
+
+/* KaTeX math */
+.mymd-content .katex-display {
+  overflow-x: auto;
+  padding: 0.5em 0;
+}
+
+/* Mermaid diagrams */
+.mymd-content .mermaid {
+  text-align: center;
+  margin: 1em 0;
+}
+
+/* Definition lists */
+.mymd-content dt {
+  font-weight: 600;
+  margin-top: 0.75em;
+}
+
+.mymd-content dd {
+  margin-left: 1.5em;
+  color: var(--mymd-text-muted);
+}

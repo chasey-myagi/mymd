@@ -1,0 +1,21 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--mymd-font-family, system-ui, sans-serif);
+  font-size: var(--mymd-font-size, 16px);
+  line-height: var(--mymd-line-height, 1.6);
+  color: var(--mymd-text);
+  background: var(--mymd-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
