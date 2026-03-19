@@ -1,21 +1,26 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
-  import { documentState } from '../stores/document'
-  import { showOutline, showSource, showSettings, showFileList } from '../stores/ui'
+  import { documentState, headings } from '../stores/document'
+  import { showSettings, showSource } from '../stores/ui'
   import { settings } from '../stores/settings'
+  import Outline from './Outline.svelte'
+  import FileList from './FileList.svelte'
 
-  // Panel visibility state — decoupled for exit animation
-  let isExpanded = false   // logical state
-  let showPanel  = false   // DOM presence
-  let isClosing  = false   // triggers close animation
+  // Panel state
+  let isExpanded = false
+  let showPanel  = false
+  let isClosing  = false
+  let activeTab: 'outline' | 'files' = 'outline'
+  let fileCount = 0
 
   let pillEl: HTMLElement
   let closeTimer: ReturnType<typeof setTimeout>
-  let flashKey: string | null = null
-  let flashTimer: ReturnType<typeof setTimeout>
 
-  $: fileName = decodeURIComponent($documentState.url.split('/').pop() ?? 'Untitled')
+  $: fileName  = decodeURIComponent($documentState.url.split('/').pop() ?? 'Untitled')
   $: wordStats = `${$documentState.wordCount} words · ${$documentState.readingTime} min`
+  $: hasOutline = $headings.length > 0
+  $: colorIcon  = $settings.colorMode === 'dark' ? '☀' : $settings.colorMode === 'light' ? '🌙' : '⊙'
+  $: colorLabel = $settings.colorMode === 'dark' ? 'Light' : $settings.colorMode === 'light' ? 'Dark' : 'System'
 
   function expand() {
     clearTimeout(closeTimer)
@@ -38,30 +43,27 @@
     isExpanded ? collapse() : expand()
   }
 
-  // Micro-feedback: flash a button briefly on action
-  function flash(key: string) {
-    flashKey = key
-    clearTimeout(flashTimer)
-    flashTimer = setTimeout(() => { flashKey = null }, 280)
+  function doToggleSource() {
+    $showSource = !$showSource
   }
 
-  function doToggleOutline()   { flash('outline');   $showOutline   = !$showOutline }
-  function doToggleFiles()     { flash('files');     $showFileList  = !$showFileList }
-  function doToggleSource()    { flash('source');    $showSource    = !$showSource }
   function doToggleColorMode() {
-    flash('color')
     settings.update(s => ({
       ...s,
       colorMode: s.colorMode === 'light' ? 'dark' : s.colorMode === 'dark' ? 'system' : 'light',
     }))
   }
+
   function doOpenSettings() {
     $showSettings = true
     collapse()
   }
 
-  $: colorIcon  = $settings.colorMode === 'dark' ? '☀' : $settings.colorMode === 'light' ? '🌙' : '⊙'
-  $: colorLabel = $settings.colorMode === 'dark' ? 'Light' : $settings.colorMode === 'light' ? 'Dark' : 'System'
+  function handleFileListLoaded(e: CustomEvent<{ count: number }>) {
+    fileCount = e.detail.count
+    // If no outline headings, auto-switch to files tab
+    if (!hasOutline && fileCount > 0) activeTab = 'files'
+  }
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Escape' && isExpanded) collapse()
@@ -80,105 +82,114 @@
     document.removeEventListener('keydown', handleKeydown)
     document.removeEventListener('mousedown', handleOutsideClick)
     clearTimeout(closeTimer)
-    clearTimeout(flashTimer)
   })
 </script>
 
 <div class="floating-pill" bind:this={pillEl}>
 
   {#if !showPanel}
-    <!-- ── Collapsed pill ── -->
+    <!-- ── Collapsed handle ── -->
     <button
       class="pill-handle"
       on:click={toggle}
-      title="Open controls"
-      aria-label="Open controls"
+      title="Open panel"
+      aria-label="Open document panel"
       aria-expanded="false"
     >
       <span class="pill-hamburger">☰</span>
     </button>
 
   {:else}
-    <!-- ── Expanded panel ── -->
+    <!-- ── Expanded liquid glass panel ── -->
     <div
       class="pill-panel"
       class:is-closing={isClosing}
       role="dialog"
-      aria-label="Document controls"
+      aria-label="Document panel"
     >
-      <!-- File info -->
-      <div class="pill-info">
+      <!-- Glass specular highlight layer -->
+      <div class="glass-highlight" aria-hidden="true"></div>
+
+      <!-- Header: filename + stats -->
+      <div class="pill-header">
         <p class="pill-filename" title={fileName}>{fileName}</p>
         {#if $settings.showStats}
           <p class="pill-stats">{wordStats}</p>
         {/if}
       </div>
 
-      <div class="pill-rule"></div>
-
-      <!-- Row 1: Outline + Files -->
-      <div class="pill-row" style="animation-delay: 30ms">
+      <!-- Tabs -->
+      <div class="pill-tabs" role="tablist">
         <button
-          class="pill-btn"
-          class:is-on={$showOutline}
-          class:is-flash={flashKey === 'outline'}
-          on:click={doToggleOutline}
-          title="Toggle outline (Ctrl+Shift+O)"
+          role="tab"
+          class="pill-tab"
+          class:active={activeTab === 'outline'}
+          aria-selected={activeTab === 'outline'}
+          on:click={() => activeTab = 'outline'}
+          title="Outline"
         >
-          <span class="pill-ico">☰</span>Outline
+          ☰ Outline
         </button>
         <button
-          class="pill-btn"
-          class:is-on={$showFileList}
-          class:is-flash={flashKey === 'files'}
-          on:click={doToggleFiles}
-          title="Toggle file list"
+          role="tab"
+          class="pill-tab"
+          class:active={activeTab === 'files'}
+          aria-selected={activeTab === 'files'}
+          on:click={() => activeTab = 'files'}
+          title="Files in directory"
         >
-          <span class="pill-ico">📁</span>Files
+          ⊞ Files{#if fileCount > 0}<span class="pill-badge">{fileCount}</span>{/if}
         </button>
       </div>
 
-      <!-- Row 2: Source + Color -->
-      <div class="pill-row" style="animation-delay: 60ms">
+      <!-- Tab content -->
+      <div class="pill-content" role="tabpanel">
+        <div class:hidden={activeTab !== 'outline'}>
+          {#if hasOutline}
+            <Outline />
+          {:else}
+            <div class="pill-empty">No headings found</div>
+          {/if}
+        </div>
+        <div class:hidden={activeTab !== 'files'}>
+          <FileList on:loaded={handleFileListLoaded} />
+        </div>
+      </div>
+
+      <!-- Footer actions -->
+      <div class="pill-footer">
         <button
-          class="pill-btn"
+          class="pill-action"
           class:is-on={$showSource}
-          class:is-flash={flashKey === 'source'}
           on:click={doToggleSource}
-          title="Toggle source (Ctrl+Shift+S)"
+          title="Toggle source view"
+          aria-pressed={$showSource}
         >
-          <span class="pill-ico">&lt;/&gt;</span>Source
+          <span>&lt;/&gt;</span>
         </button>
         <button
-          class="pill-btn"
-          class:is-flash={flashKey === 'color'}
+          class="pill-action"
           on:click={doToggleColorMode}
           title="{colorLabel} mode"
         >
-          <span class="pill-ico">{colorIcon}</span>{colorLabel}
+          <span>{colorIcon}</span>
+        </button>
+        <button
+          class="pill-action"
+          on:click={doOpenSettings}
+          title="Settings"
+        >
+          <span>⚙</span>
+        </button>
+        <button
+          class="pill-close"
+          on:click={collapse}
+          aria-label="Close panel (Escape)"
+          title="Close (Esc)"
+        >
+          ✕
         </button>
       </div>
-
-      <div class="pill-rule" style="animation-delay: 80ms"></div>
-
-      <!-- Settings -->
-      <button
-        class="pill-btn pill-btn-full"
-        style="animation-delay: 90ms"
-        on:click={doOpenSettings}
-        title="Settings"
-      >
-        <span class="pill-ico">⚙</span>Settings
-      </button>
-
-      <!-- Auto-refresh indicator -->
-      <div class="pill-status" style="animation-delay: 110ms">
-        <span class="pill-dot" class:pill-dot-on={$settings.autoRefresh}></span>
-        Auto-refresh {$settings.autoRefresh ? 'on' : 'off'}
-      </div>
-
-      <!-- Close -->
-      <button class="pill-close" on:click={collapse} aria-label="Close (Escape)">✕</button>
     </div>
   {/if}
 
@@ -188,13 +199,13 @@
   /* ─── Container ──────────────────────────────── */
   .floating-pill {
     position: fixed;
-    right: 16px;
+    left: 0;
     top: 50%;
     transform: translateY(-50%);
     z-index: 100;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
   }
 
   /* ─── Collapsed handle ───────────────────────── */
@@ -202,35 +213,41 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 88px;
-    border-radius: 18px;
-    background: color-mix(in srgb, var(--mymd-toolbar-bg, var(--mymd-surface)) 78%, transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid color-mix(in srgb, var(--mymd-border) 55%, transparent);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.07);
+    width: 28px;
+    height: 80px;
+    border-radius: 0 18px 18px 0;
+    background: color-mix(in srgb, var(--mymd-toolbar-bg, var(--mymd-surface)) 72%, transparent);
+    backdrop-filter: blur(16px) saturate(1.5);
+    -webkit-backdrop-filter: blur(16px) saturate(1.5);
+    border: 1px solid color-mix(in srgb, var(--mymd-border) 50%, transparent);
+    border-left: none;
+    box-shadow:
+      2px 2px 12px rgba(0,0,0,0.10),
+      1px 0 4px rgba(0,0,0,0.06),
+      inset 0 1px 0 rgba(255,255,255,0.15);
     cursor: pointer;
     color: var(--mymd-text-muted);
-    font-size: 1rem;
+    font-size: 0.875rem;
     padding: 0;
-    /* Breathing: subtle presence, not distracting */
     animation: pill-breathe 6s ease-in-out infinite;
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease, color 0.15s ease;
   }
 
   .pill-handle:hover {
     animation-play-state: paused;
-    opacity: 0.95;
-    scale: 1.05;
+    opacity: 1;
     color: var(--mymd-text);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.14), 0 1px 4px rgba(0,0,0,0.08);
-    transition: opacity 0.2s ease, scale 0.2s ease, box-shadow 0.2s ease;
+    box-shadow:
+      3px 3px 18px rgba(0,0,0,0.14),
+      1px 0 6px rgba(0,0,0,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.20);
+    width: 32px;
+    transition: width 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   }
 
   @keyframes pill-breathe {
-    0%, 100% { opacity: 0.50; }
-    50%       { opacity: 0.72; }
+    0%, 100% { opacity: 0.48; }
+    50%       { opacity: 0.70; }
   }
 
   .pill-hamburger {
@@ -238,46 +255,71 @@
     line-height: 1;
   }
 
-  /* ─── Expanded panel ─────────────────────────── */
+  /* ─── Expanded glass panel ───────────────────── */
   .pill-panel {
     position: relative;
-    width: 280px;
-    border-radius: 16px;
-    background: color-mix(in srgb, var(--mymd-bg) 92%, transparent);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid color-mix(in srgb, var(--mymd-border) 65%, transparent);
+    width: 260px;
+    max-height: calc(100vh - 48px);
+    border-radius: 0 20px 20px 0;
+    /* Liquid glass base */
+    background: color-mix(in srgb, var(--mymd-bg) 78%, transparent);
+    backdrop-filter: blur(28px) saturate(1.8) brightness(1.02);
+    -webkit-backdrop-filter: blur(28px) saturate(1.8) brightness(1.02);
+    border: 1px solid color-mix(in srgb, var(--mymd-border) 55%, transparent);
+    border-left: none;
     box-shadow:
-      0 8px 32px rgba(0,0,0,0.13),
-      0 2px 8px rgba(0,0,0,0.07),
-      0 0 0 0.5px color-mix(in srgb, var(--mymd-border) 40%, transparent);
-    padding: 16px;
-    transform-origin: right center;
-    animation: pill-open 0.2s ease-out both;
+      4px 8px 32px rgba(0,0,0,0.13),
+      2px 2px 10px rgba(0,0,0,0.07),
+      inset 0 1px 0 rgba(255,255,255,0.18),
+      inset 1px 0 0 rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform-origin: left center;
+    animation: panel-open 0.2s ease-out both;
   }
 
   .pill-panel.is-closing {
-    animation: pill-close 0.15s ease-in both;
+    animation: panel-close 0.15s ease-in both;
   }
 
-  @keyframes pill-open {
-    from { opacity: 0; scale: 0.90; }
-    to   { opacity: 1; scale: 1; }
+  @keyframes panel-open {
+    from { opacity: 0; transform: scaleX(0.88); }
+    to   { opacity: 1; transform: scaleX(1); }
   }
 
-  @keyframes pill-close {
-    from { opacity: 1; scale: 1; }
-    to   { opacity: 0; scale: 0.95; }
+  @keyframes panel-close {
+    from { opacity: 1; transform: scaleX(1); }
+    to   { opacity: 0; transform: scaleX(0.92); }
   }
 
-  /* ─── File info ──────────────────────────────── */
-  .pill-info {
-    padding-right: 24px; /* room for close btn */
-    padding-bottom: 8px;
+  /* Specular highlight — top edge gleam */
+  .glass-highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.04) 50%,
+      transparent 100%
+    );
+    border-radius: 0 20px 0 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ─── Header ─────────────────────────────────── */
+  .pill-header {
+    padding: 14px 16px 8px;
+    z-index: 2;
+    flex-shrink: 0;
   }
 
   .pill-filename {
-    font-size: 0.8125rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--mymd-text);
     overflow: hidden;
@@ -293,128 +335,141 @@
     margin: 2px 0 0;
   }
 
-  /* ─── Divider ────────────────────────────────── */
-  .pill-rule {
-    height: 1px;
-    background: var(--mymd-border);
-    margin: 8px 0;
-    opacity: 0.5;
-    animation: pill-in 0.2s ease-out both;
-  }
-
-  /* ─── Rows ───────────────────────────────────── */
-  .pill-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    margin-bottom: 4px;
-    animation: pill-in 0.2s ease-out both;
-  }
-
-  @keyframes pill-in {
-    from { opacity: 0; transform: translateY(5px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ─── Buttons ────────────────────────────────── */
-  .pill-btn {
+  /* ─── Tabs ───────────────────────────────────── */
+  .pill-tabs {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    gap: 2px;
+    padding: 0 10px 6px;
+    flex-shrink: 0;
+    z-index: 2;
+  }
+
+  .pill-tab {
+    flex: 1;
     background: none;
     border: 1px solid transparent;
     border-radius: 8px;
     cursor: pointer;
-    padding: 6px 8px;
-    font-size: 0.75rem;
+    padding: 5px 8px;
+    font-size: 0.7rem;
+    font-weight: 500;
     color: var(--mymd-text-muted);
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     white-space: nowrap;
-    overflow: hidden;
-    width: 100%;
-    line-height: 1.3;
   }
 
-  .pill-btn:hover {
+  .pill-tab:hover {
     background: var(--mymd-hover);
     color: var(--mymd-text);
   }
 
-  /* Active / toggled-on state */
-  .pill-btn.is-on {
+  .pill-tab.active {
     color: var(--mymd-link);
     background: color-mix(in srgb, var(--mymd-link) 10%, transparent);
     border-color: color-mix(in srgb, var(--mymd-link) 20%, transparent);
   }
 
-  /* Micro-feedback flash */
-  .pill-btn.is-flash {
-    animation: pill-flash 0.28s ease;
-  }
-
-  @keyframes pill-flash {
-    0%, 100% { background: var(--mymd-hover); }
-    45%       { background: color-mix(in srgb, var(--mymd-link) 24%, transparent); }
-  }
-
-  .pill-btn-full {
-    width: 100%;
-    animation: pill-in 0.2s ease-out both;
-  }
-
-  .pill-ico {
-    font-size: 0.875rem;
+  .pill-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--mymd-link) 15%, transparent);
+    color: var(--mymd-link);
+    font-size: 0.6rem;
+    font-weight: 700;
     line-height: 1;
-    flex-shrink: 0;
-    width: 16px;
-    text-align: center;
-    opacity: 0.85;
   }
 
-  /* ─── Status footer ──────────────────────────── */
-  .pill-status {
+  /* ─── Content area ───────────────────────────── */
+  .pill-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px 0 4px;
+    z-index: 2;
+    /* Custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--mymd-border) 80%, transparent) transparent;
+  }
+
+  .pill-content::-webkit-scrollbar { width: 4px; }
+  .pill-content::-webkit-scrollbar-track { background: transparent; }
+  .pill-content::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--mymd-border) 80%, transparent);
+    border-radius: 2px;
+  }
+
+  .hidden { display: none; }
+
+  .pill-empty {
+    padding: 16px;
+    font-size: 0.75rem;
+    color: var(--mymd-text-muted);
+    font-style: italic;
+    text-align: center;
+  }
+
+  /* ─── Footer actions ─────────────────────────── */
+  .pill-footer {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.6875rem;
-    color: var(--mymd-text-muted);
-    padding: 4px 8px;
-    margin-top: 2px;
-    animation: pill-in 0.2s ease-out both;
-  }
-
-  .pill-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--mymd-text-muted);
-    opacity: 0.35;
+    gap: 2px;
+    padding: 8px 10px 12px;
+    border-top: 1px solid color-mix(in srgb, var(--mymd-border) 50%, transparent);
     flex-shrink: 0;
-    transition: background 0.3s ease, opacity 0.3s ease;
+    z-index: 2;
   }
 
-  .pill-dot.pill-dot-on {
-    background: #22c55e;
-    opacity: 1;
+  .pill-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+    color: var(--mymd-text-muted);
+    font-size: 0.875rem;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    padding: 0;
+    line-height: 1;
   }
 
-  /* ─── Close button ───────────────────────────── */
+  .pill-action:hover {
+    background: var(--mymd-hover);
+    color: var(--mymd-text);
+  }
+
+  .pill-action.is-on {
+    color: var(--mymd-link);
+    background: color-mix(in srgb, var(--mymd-link) 10%, transparent);
+    border-color: color-mix(in srgb, var(--mymd-link) 22%, transparent);
+  }
+
+  /* Close button pushed to the right */
   .pill-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 24px;
-    height: 24px;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: none;
     background: none;
     cursor: pointer;
     color: var(--mymd-text-muted);
-    font-size: 0.625rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 0.6rem;
     transition: background 0.15s ease, color 0.15s ease;
     padding: 0;
     line-height: 1;
@@ -430,24 +485,14 @@
     .pill-handle {
       animation: none;
       opacity: 0.65;
+      transition: none;
     }
     .pill-handle:hover {
-      opacity: 0.95;
-      scale: unset;
-      transition: none;
+      opacity: 1;
+      width: 28px;
     }
     .pill-panel,
     .pill-panel.is-closing {
-      animation: none;
-    }
-    .pill-row,
-    .pill-rule,
-    .pill-btn-full,
-    .pill-status {
-      animation: none !important;
-      opacity: 1 !important;
-    }
-    .pill-btn.is-flash {
       animation: none;
     }
   }
