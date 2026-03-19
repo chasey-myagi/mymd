@@ -294,8 +294,11 @@
     --_fg: var(--mymd-text, #1a1a1a);
     --_muted: var(--mymd-text-muted, #8b8b8b);
     --_accent: var(--mymd-link, #2563eb);
-    --_border: rgba(0, 0, 0, 0.07);
-    --_surface: rgba(0, 0, 0, 0.025);
+    --_border: rgba(0, 0, 0, 0.06);
+    --_surface: rgba(0, 0, 0, 0.028);
+    --_r: 10px;      /* standard radius — squircle feel */
+    --_r-sm: 8px;    /* small controls */
+    --_r-pill: 99px;  /* pill shapes */
 
     background: var(--_bg);
     color: var(--_fg);
@@ -339,7 +342,7 @@
     -webkit-appearance: none;
     background: var(--_surface);
     border: 1px solid var(--_border);
-    border-radius: 8px;
+    border-radius: var(--_r);
     padding: 8px 32px 8px 12px;
     font-size: 13px;
     font-weight: 500;
@@ -362,7 +365,7 @@
     gap: 2px;
     padding: 3px;
     background: var(--_surface);
-    border-radius: 10px;
+    border-radius: var(--_r);
     border: 1px solid var(--_border);
   }
 
@@ -371,7 +374,7 @@
     height: 28px;
     border: none;
     background: transparent;
-    border-radius: 7px;
+    border-radius: calc(var(--_r) - 3px);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -387,7 +390,10 @@
   .mode-btn.on {
     background: var(--_bg);
     color: var(--_fg);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0.5px 1px rgba(0,0,0,0.05);
+    box-shadow:
+      0 1px 3px rgba(0,0,0,0.06),
+      0 0.5px 1px rgba(0,0,0,0.04),
+      0 0 0 0.5px rgba(0,0,0,0.03);
   }
 
   /* ─── Groups ─── */
@@ -434,8 +440,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 5px 20px;
-    min-height: 34px;
+    padding: 4px 20px;
+    min-height: 32px;
   }
 
   .control-label {
@@ -449,7 +455,7 @@
     -webkit-appearance: none;
     background: var(--_surface);
     border: 1px solid var(--_border);
-    border-radius: 6px;
+    border-radius: var(--_r-sm);
     padding: 4px 24px 4px 8px;
     font-size: 12px;
     font-family: inherit;
@@ -472,7 +478,7 @@
     gap: 0;
     background: var(--_surface);
     border: 1px solid var(--_border);
-    border-radius: 6px;
+    border-radius: var(--_r-sm);
     height: 28px;
     overflow: hidden;
   }
@@ -499,7 +505,8 @@
   }
 
   .num-btn:active:not(:disabled) {
-    background: rgba(0,0,0,0.08);
+    background: rgba(0,0,0,0.09);
+    transform: scale(0.95);
   }
 
   .num-btn:disabled {
@@ -514,8 +521,8 @@
     font-variant-numeric: tabular-nums;
     color: var(--_fg);
     font-weight: 500;
-    border-left: 1px solid var(--_border);
-    border-right: 1px solid var(--_border);
+    border-left: 1px solid rgba(0, 0, 0, 0.04);
+    border-right: 1px solid rgba(0, 0, 0, 0.04);
     height: 100%;
     display: flex;
     align-items: center;
@@ -527,7 +534,7 @@
     position: relative;
     width: 32px;
     height: 18px;
-    border-radius: 9px;
+    border-radius: var(--_r-pill);
     border: none;
     cursor: pointer;
     padding: 0;
@@ -548,7 +555,7 @@
     height: 14px;
     border-radius: 50%;
     background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.12), 0 0.5px 0.5px rgba(0,0,0,0.08);
     transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1);
     display: block;
     pointer-events: none;
@@ -613,7 +620,7 @@
     line-height: 1.5;
     padding: 8px 10px;
     border: 1px solid var(--_border);
-    border-radius: 6px;
+    border-radius: var(--_r-sm);
     background: var(--_surface);
     color: var(--_fg);
     resize: none;
@@ -635,7 +642,7 @@
     flex: 1;
     height: 28px;
     border: 1px solid var(--_border);
-    border-radius: 6px;
+    border-radius: var(--_r-sm);
     background: transparent;
     color: var(--_muted);
     font-size: 11px;
@@ -648,7 +655,12 @@
   .io-btn:hover {
     background: var(--_surface);
     color: var(--_fg);
-    border-color: rgba(0,0,0,0.12);
+    border-color: rgba(0,0,0,0.1);
+    transform: translateY(-0.5px);
+  }
+
+  .io-btn:active {
+    transform: translateY(0);
   }
 
   /* ─── Footer ─── */
