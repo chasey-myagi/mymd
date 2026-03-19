@@ -9,7 +9,9 @@ export function resolveColorMode(mode: 'light' | 'dark' | 'system'): 'light' | '
 
 export function applyTheme(theme: MymdTheme, overrides: Record<string, string>): void {
   const el = document.documentElement
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const reducedMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false
 
   if (!reducedMotion) {
     el.style.transition = 'background-color 0.3s ease, color 0.3s ease'
