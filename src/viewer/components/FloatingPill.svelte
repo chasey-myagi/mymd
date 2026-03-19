@@ -163,13 +163,20 @@
     width: 36px;
     height: 80px;
     border-radius: 18px;
-    background: rgba(255, 255, 255, 0.82);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    /* Multi-layer liquid glass background */
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%),
+      rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+    -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+    /* Glass depth: multi-layer shadows */
+    border: 0.5px solid rgba(255, 255, 255, 0.6);
     box-shadow:
-      0 4px 16px rgba(0,0,0,0.10),
-      0 1px 3px rgba(0,0,0,0.06);
+      0 0 0 0.5px rgba(0, 0, 0, 0.05),
+      0 4px 16px rgba(0, 0, 0, 0.08),
+      0 1px 3px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03);
     cursor: pointer;
     color: rgba(0,0,0,0.55);
     font-size: 0.9375rem;
@@ -183,14 +190,33 @@
     opacity: 1;
     color: rgba(0,0,0,0.8);
     box-shadow:
-      0 8px 24px rgba(0,0,0,0.14),
-      0 2px 6px rgba(0,0,0,0.08);
-    border-color: rgba(0, 0, 0, 0.12);
+      0 0 0 0.5px rgba(0, 0, 0, 0.07),
+      0 8px 24px rgba(0, 0, 0, 0.12),
+      0 2px 6px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.04);
+    border-color: rgba(255, 255, 255, 0.7);
   }
 
   @keyframes breathe {
-    0%, 100% { opacity: 0.6; }
-    50%       { opacity: 0.85; }
+    0%, 100% {
+      opacity: 0.6;
+      box-shadow:
+        0 0 0 0.5px rgba(0, 0, 0, 0.05),
+        0 4px 16px rgba(0, 0, 0, 0.06),
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+    }
+    50% {
+      opacity: 0.85;
+      box-shadow:
+        0 0 0 0.5px rgba(0, 0, 0, 0.06),
+        0 6px 20px rgba(0, 0, 0, 0.09),
+        0 1px 4px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+    }
   }
 
   /* ─── Expanded glass panel ───────────────────── */
@@ -199,13 +225,19 @@
     width: 280px;
     height: 90vh;
     border-radius: 20px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    /* Multi-layer liquid glass panel */
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.2) 4%, rgba(255,255,255,0) 8%),
+      rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(50px) saturate(200%) brightness(1.02);
+    -webkit-backdrop-filter: blur(50px) saturate(200%) brightness(1.02);
+    border: 0.5px solid rgba(255, 255, 255, 0.5);
     box-shadow:
-      0 8px 32px rgba(0,0,0,0.12),
-      0 2px 6px rgba(0,0,0,0.06);
+      0 0 0 0.5px rgba(0, 0, 0, 0.04),
+      0 8px 40px rgba(0, 0, 0, 0.10),
+      0 2px 8px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -0.5px 0 rgba(0, 0, 0, 0.02);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -227,15 +259,16 @@
     to   { opacity: 0; transform: scale(0.95); }
   }
 
-  /* Glass specular sheen on top edge */
+  /* Glass specular sheen — simulates surface refraction highlight */
   .glass-sheen {
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 52px;
+    height: 60px;
     background: linear-gradient(
       180deg,
-      rgba(255,255,255,0.22) 0%,
-      rgba(255,255,255,0.06) 55%,
+      rgba(255, 255, 255, 0.35) 0%,
+      rgba(255, 255, 255, 0.12) 30%,
+      rgba(255, 255, 255, 0.03) 60%,
       transparent 100%
     );
     border-radius: 20px 20px 0 0;
@@ -243,28 +276,40 @@
     z-index: 1;
   }
 
-  /* ─── Dark mode overrides ────────────────────── */
+  /* ─── Dark mode overrides — deep liquid glass ── */
+  :global([data-color-mode="dark"]) .pill-handle,
+  :global([data-color-mode="dark"]) .pill-panel {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 6%, transparent 12%),
+      rgba(40, 40, 40, 0.65);
+    backdrop-filter: blur(50px) saturate(180%) brightness(0.95);
+    -webkit-backdrop-filter: blur(50px) saturate(180%) brightness(0.95);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 0 0 0.5px rgba(255, 255, 255, 0.06),
+      0 8px 40px rgba(0, 0, 0, 0.35),
+      0 2px 8px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -0.5px 0 rgba(0, 0, 0, 0.15);
+  }
   :global([data-color-mode="dark"]) .pill-handle {
-    background: rgba(30, 30, 30, 0.72);
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(255,255,255,0.05);
     color: rgba(255,255,255,0.45);
   }
   :global([data-color-mode="dark"]) .pill-handle:hover {
     color: rgba(255,255,255,0.85);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 0 0.5px rgba(255,255,255,0.08);
-  }
-  :global([data-color-mode="dark"]) .pill-panel {
-    background: rgba(30, 30, 30, 0.72);
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(255,255,255,0.05);
+    box-shadow:
+      0 0 0 0.5px rgba(255, 255, 255, 0.09),
+      0 12px 48px rgba(0, 0, 0, 0.45),
+      0 3px 10px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -0.5px 0 rgba(0, 0, 0, 0.18);
   }
   :global([data-color-mode="dark"]) .glass-sheen {
     background: linear-gradient(
       180deg,
-      rgba(255,255,255,0.06) 0%,
-      rgba(255,255,255,0.02) 55%,
-      transparent 100%
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.03) 30%,
+      transparent 60%
     );
   }
 
@@ -274,6 +319,7 @@
     align-items: flex-start;
     gap: 8px;
     padding: 14px 12px 8px 16px;
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.05);
     z-index: 2;
     flex-shrink: 0;
   }
@@ -334,7 +380,7 @@
   .pill-tab {
     flex: 1;
     background: none;
-    border: 1px solid color-mix(in srgb, var(--mymd-border) 60%, transparent);
+    border: 0.5px solid rgba(0, 0, 0, 0.08);
     cursor: pointer;
     padding: 7px 12px;
     font-size: 0.8125rem;
@@ -422,7 +468,7 @@
     align-items: center;
     gap: 4px;
     padding: 8px 12px 12px;
-    border-top: 1px solid color-mix(in srgb, var(--mymd-border) 40%, transparent);
+    border-top: 0.5px solid rgba(0, 0, 0, 0.06);
     flex-shrink: 0;
     z-index: 2;
   }
