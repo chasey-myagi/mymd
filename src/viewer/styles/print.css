@@ -1,6 +1,7 @@
 @media print {
-  .toolbar, .sidebar, .progress-bar, .scroll-top,
-  .settings-overlay, .image-overlay {
+  .toolbar, .sidebar, .sidebar-left, .sidebar-right,
+  .progress-bar, .scroll-top, .settings-overlay, .image-overlay,
+  .floating-pill {
     display: none !important;
   }
 

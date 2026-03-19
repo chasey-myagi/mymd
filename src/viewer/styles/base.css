@@ -1,3 +1,15 @@
+:root {
+  --mymd-text-muted: #656d76;
+  --mymd-surface: #f6f8fa;
+  --mymd-hover: rgba(0, 0, 0, 0.04);
+  --mymd-font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
+  --mymd-font-heading: inherit;
+  --mymd-font-code: var(--mymd-font-mono);
+  --mymd-code-block-bg: var(--mymd-code-bg, #f6f8fa);
+  --mymd-radius: 6px;
+  --mymd-mark-text: inherit;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
