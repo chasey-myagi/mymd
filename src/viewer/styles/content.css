@@ -218,6 +218,20 @@
   font-family: var(--mymd-font-family, system-ui, sans-serif);
   font-size: var(--mymd-font-size, 16px);
   line-height: var(--mymd-line-height, 1.6);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* CJK-friendly typography */
+.mymd-content:lang(zh),
+.mymd-content:lang(ja),
+.mymd-content:lang(ko) {
+  text-align: justify;
+  text-justify: inter-ideograph;
+}
+
+.mymd-content {
+  text-spacing-trim: space-first;
 }
 
 /* Headings */
@@ -344,6 +358,7 @@
 
 /* Code blocks */
 .mymd-content pre {
+  position: relative;
   margin: 1em 0;
   border-radius: var(--mymd-radius, 6px);
   overflow: auto;
@@ -358,14 +373,79 @@
   border-radius: 0;
 }
 
+.code-lang-label {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 0.7rem;
+  color: var(--mymd-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  user-select: none;
+  font-family: var(--mymd-font-mono, ui-monospace, monospace);
+  pointer-events: none;
+}
+
+.code-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: color-mix(in srgb, var(--mymd-bg) 80%, transparent);
+  border: 1px solid var(--mymd-border);
+  border-radius: var(--mymd-radius-sm, 4px);
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  color: var(--mymd-text-muted);
+  font-family: var(--mymd-font-family, system-ui, sans-serif);
+  line-height: 1.4;
+}
+
+.mymd-content pre:hover .code-copy-btn {
+  opacity: 1;
+}
+
+.code-copy-btn:hover {
+  background: var(--mymd-hover);
+  color: var(--mymd-text);
+}
+
+.code-copy-btn.copied {
+  color: var(--mymd-alert-tip, #2da44e);
+}
+
 /* Tables */
+.mymd-content .table-wrapper {
+  position: relative;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1em 0;
+}
+
+.mymd-content .table-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  background: linear-gradient(to right, transparent, var(--mymd-bg));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.mymd-content .table-wrapper.has-overflow::after {
+  opacity: 1;
+}
+
 .mymd-content table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1em 0;
+  margin: 0;
   font-size: 0.9em;
-  display: block;
-  overflow-x: auto;
 }
 
 .mymd-content th,
@@ -525,9 +605,15 @@
 
 /* KaTeX math */
 .mymd-content .katex-display {
+  position: relative;
   overflow-x: auto;
-  padding: 0.75em 0;
-  margin: 1em 0;
+  overflow-y: hidden;
+  padding: 1em 0;
+  margin: 1.5em 0;
+}
+
+.mymd-content .katex-display > .katex {
+  text-align: center;
 }
 
 .mymd-content .katex {
