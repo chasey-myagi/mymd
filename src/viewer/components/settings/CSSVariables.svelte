@@ -40,9 +40,70 @@
           on:input={(e) => setVariable(varName, e.currentTarget.value)}
         />
         {#if $settings.cssVariables[varName]}
-          <button class="reset-btn" on:click={() => resetVariable(varName)}>↺</button>
+          <button class="reset-btn" on:click={() => resetVariable(varName)} title="Reset to theme default">↺</button>
         {/if}
       </div>
     {/each}
   </div>
 </section>
+
+<style>
+  .settings-section {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--mymd-border, #eee);
+  }
+
+  .settings-section h4 {
+    margin: 0 0 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--mymd-text-secondary, #888);
+  }
+
+  .variables-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .variable-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  label {
+    flex: 1;
+    font-size: 0.82rem;
+    color: var(--mymd-text, #333);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  input[type="color"] {
+    width: 32px;
+    height: 22px;
+    padding: 0;
+    border: 1px solid var(--mymd-border, #ddd);
+    border-radius: var(--mymd-radius-sm, 4px);
+    cursor: pointer;
+    background: none;
+  }
+
+  .reset-btn {
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--mymd-text-secondary, #888);
+    padding: 0 0.2rem;
+    line-height: 1;
+  }
+
+  .reset-btn:hover {
+    color: var(--mymd-link, #0969da);
+  }
+</style>

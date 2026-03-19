@@ -61,7 +61,90 @@
   </div>
 
   <div class="settings-row">
-    <button on:click={handleImport}>Import Theme</button>
-    <button on:click={handleExport}>Export Theme</button>
+    <button class="btn" on:click={handleImport}>Import Theme</button>
+    <button class="btn" on:click={handleExport}>Export Theme</button>
   </div>
 </section>
+
+<style>
+  .settings-section {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--mymd-border, #eee);
+  }
+
+  .settings-section h4 {
+    margin: 0 0 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--mymd-text-secondary, #888);
+  }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .theme-card {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--mymd-border, #ddd);
+    border-radius: var(--mymd-radius-sm, 4px);
+    background: var(--mymd-code-bg, #f5f5f5);
+    color: var(--mymd-text, #333);
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-transform: capitalize;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .theme-card:hover {
+    border-color: var(--mymd-link, #0969da);
+  }
+
+  .theme-card.active {
+    border-color: var(--mymd-link, #0969da);
+    background: var(--mymd-sidebar-active, #0969da);
+    color: #fff;
+  }
+
+  .settings-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .settings-row label {
+    font-size: 0.85rem;
+    color: var(--mymd-text-secondary, #666);
+    min-width: 80px;
+  }
+
+  select {
+    flex: 1;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--mymd-border, #ddd);
+    border-radius: var(--mymd-radius-sm, 4px);
+    background: var(--mymd-bg, #fff);
+    color: var(--mymd-text, #333);
+    font-size: 0.85rem;
+  }
+
+  .btn {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--mymd-border, #ddd);
+    border-radius: var(--mymd-radius-sm, 4px);
+    background: var(--mymd-code-bg, #f5f5f5);
+    color: var(--mymd-text, #333);
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    border-color: var(--mymd-link, #0969da);
+    color: var(--mymd-link, #0969da);
+  }
+</style>

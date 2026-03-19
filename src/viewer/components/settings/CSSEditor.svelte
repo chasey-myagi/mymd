@@ -32,3 +32,33 @@
   <h4>Custom CSS</h4>
   <div class="css-editor" bind:this={editorEl}></div>
 </section>
+
+<style>
+  .settings-section {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--mymd-border, #eee);
+  }
+
+  .settings-section h4 {
+    margin: 0 0 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--mymd-text-secondary, #888);
+  }
+
+  .css-editor {
+    border: 1px solid var(--mymd-border, #ddd);
+    border-radius: var(--mymd-radius-sm, 4px);
+    overflow: hidden;
+    font-size: 0.8rem;
+    min-height: 150px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  :global(.css-editor .cm-editor) {
+    height: 100%;
+  }
+</style>
