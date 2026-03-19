@@ -65,6 +65,28 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true // async response
   }
 
+  if (message.type === 'FETCH_FILE') {
+    // Viewer requests file:// content directly (used on refresh when session storage is empty)
+    try {
+      const url = new URL(message.url)
+      if (url.protocol !== 'file:') {
+        sendResponse({ success: false, error: 'Only file:// URLs allowed' })
+        return true
+      }
+    } catch {
+      sendResponse({ success: false, error: 'Invalid URL' })
+      return true
+    }
+    fetch(message.url)
+      .then(res => {
+        if (!res.ok) throw new Error(`Failed to read file`)
+        return res.text()
+      })
+      .then(text => sendResponse({ success: true, content: text }))
+      .catch(err => sendResponse({ success: false, error: err.message }))
+    return true
+  }
+
   if (message.type === 'LIST_DIRECTORY') {
     try {
       const url = new URL(message.url)

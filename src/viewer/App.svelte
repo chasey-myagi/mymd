@@ -47,11 +47,21 @@
     const hasChromeApi = typeof chrome !== 'undefined' && chrome.runtime?.sendMessage
 
     if (url.startsWith('file://') && hasChromeApi) {
+      // Try session storage first (set by content script on initial load)
       const key = `file_content_${url}`
       const result = await chrome.storage.session.get(key)
       const content = result[key] ?? ''
-      chrome.storage.session.remove(key).catch(() => {})
-      return content
+      if (content) {
+        // Don't delete — needed for refresh
+        return content
+      }
+      // Fallback: ask background SW to fetch file directly (handles refresh)
+      return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ type: 'FETCH_FILE', url }, (response) => {
+          if (response?.success) resolve(response.content)
+          else reject(new Error(response?.error ?? 'Failed to load file'))
+        })
+      })
     }
 
     if (hasChromeApi) {
