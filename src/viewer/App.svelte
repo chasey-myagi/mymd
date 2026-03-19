@@ -7,6 +7,7 @@
   import ErrorPage from './components/ErrorPage.svelte'
   import FileList from './components/FileList.svelte'
   import Outline from './components/Outline.svelte'
+  import SettingsPanel from './components/settings/SettingsPanel.svelte'
   import { documentState } from './stores/document'
   import { settings, initSettings } from './stores/settings'
   import { showOutline, showFileList, showSource, scrollProgress } from './stores/ui'
@@ -18,6 +19,7 @@
   import type { Heading } from '../types'
   import './styles/base.css'
   import './styles/content.css'
+  import './styles/print.css'
 
   let error = ''
   let errorType: 'network' | 'notfound' | 'permission' | 'toolarge' = 'network'
@@ -124,4 +126,5 @@
     {/if}
   </div>
   <ScrollTop />
+  <SettingsPanel />
 {/if}
