@@ -9,14 +9,23 @@ export function resolveColorMode(mode: 'light' | 'dark' | 'system'): 'light' | '
 
 export function applyTheme(theme: MymdTheme, overrides: Record<string, string>): void {
   const el = document.documentElement
-  const merged = { ...theme.cssVariables, ...overrides }
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+  if (!reducedMotion) {
+    el.style.transition = 'background-color 0.3s ease, color 0.3s ease'
+  }
+
+  const merged = { ...theme.cssVariables, ...overrides }
   for (const [key, value] of Object.entries(merged)) {
     el.style.setProperty(key, value)
   }
 
   el.setAttribute('data-theme', theme.name)
   el.setAttribute('data-color-mode', theme.colorMode)
+
+  if (!reducedMotion) {
+    setTimeout(() => { el.style.transition = '' }, 350)
+  }
 }
 
 export function applyCustomCSS(css: string): void {
