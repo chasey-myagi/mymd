@@ -20,9 +20,17 @@
       "run_at": "document_end"
     }
   ],
+  "action": {
+    "default_icon": {
+      "16": "src/assets/icons/icon16.png",
+      "48": "src/assets/icons/icon48.png",
+      "128": "src/assets/icons/icon128.png"
+    }
+  },
   "permissions": [
     "activeTab",
     "storage",
+    "tabs",
     "webNavigation"
   ],
   "host_permissions": [
