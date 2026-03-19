@@ -14,6 +14,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        viewer: path.resolve(__dirname, 'src/viewer/index.html'),
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     globals: true,

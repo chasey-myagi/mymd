@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { settings } from '../../stores/settings'
-  import { EditorView, basicSetup } from '@codemirror/view'
+  import { EditorView } from '@codemirror/view'
+  import { basicSetup } from 'codemirror'
   import { EditorState } from '@codemirror/state'
   import { css } from '@codemirror/lang-css'
   import { oneDark } from '@codemirror/theme-one-dark'
