@@ -14,7 +14,7 @@
   let closeTimer: ReturnType<typeof setTimeout>
 
   $: fileName = decodeURIComponent($documentState.url.split('/').pop() ?? '')
-  $: stats = `${$documentState.wordCount} words · ${$documentState.readingTime} min`
+  $: stats = `${$documentState.wordCount} 字 · ${$documentState.readingTime} 分钟`
   $: isFileProtocol = $documentState.url.startsWith('file://')
   $: hasOutline = $headings.length > 0
 
@@ -67,8 +67,8 @@
     <button
       class="pill-handle"
       on:click={toggle}
-      title="Open panel"
-      aria-label="Open document panel"
+      title="打开面板"
+      aria-label="打开文档面板"
       aria-expanded="false"
     >
       <span>☰</span>
@@ -80,7 +80,7 @@
       class="pill-panel"
       class:is-closing={isClosing}
       role="dialog"
-      aria-label="Document panel"
+      aria-label="文档面板"
     >
       <!-- Glass specular highlight -->
       <div class="glass-sheen" aria-hidden="true"></div>
@@ -93,7 +93,7 @@
             <p class="pill-stats">{stats}</p>
           {/if}
         </div>
-        <button class="pill-close" on:click={close} aria-label="Close (Escape)" title="Close (Esc)">✕</button>
+        <button class="pill-close" on:click={close} aria-label="关闭 (Esc)" title="关闭 (Esc)">✕</button>
       </div>
 
       <!-- Connected pill tab switcher -->
@@ -125,7 +125,7 @@
           {#if hasOutline}
             <Outline />
           {:else}
-            <div class="pill-empty">No headings found</div>
+            <div class="pill-empty">暂无标题</div>
           {/if}
         </div>
         <div class:hidden={activeTab !== 'files'}>
@@ -139,15 +139,15 @@
           class="pill-action"
           class:is-on={$showSource}
           on:click={() => $showSource = !$showSource}
-          title="Toggle source view"
+          title="切换源码视图"
           aria-pressed={$showSource}
         >
-          &lt;/&gt; Source
+          &lt;/&gt; 源码
         </button>
         <button
           class="pill-action pill-action-icon"
           on:click={() => $showSettings = true}
-          title="Settings"
+          title="设置"
         >
           ⚙
         </button>
@@ -162,7 +162,7 @@
   .floating-pill {
     position: fixed;
     left: 16px;
-    top: 20%;
+    top: 5vh;
     z-index: 100;
   }
 
@@ -208,7 +208,7 @@
   .pill-panel {
     position: relative;
     width: 280px;
-    max-height: calc(80vh);
+    height: 90vh;
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(40px) saturate(180%);
@@ -295,7 +295,7 @@
   }
 
   .pill-filename {
-    font-size: 0.8125rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: var(--mymd-text);
     overflow: hidden;
@@ -306,7 +306,7 @@
   }
 
   .pill-stats {
-    font-size: 0.6875rem;
+    font-size: 0.8rem;
     color: var(--mymd-text-muted);
     margin: 2px 0 0;
   }
@@ -347,8 +347,8 @@
     background: none;
     border: 1px solid color-mix(in srgb, var(--mymd-border) 60%, transparent);
     cursor: pointer;
-    padding: 5px 8px;
-    font-size: 0.7rem;
+    padding: 7px 12px;
+    font-size: 0.8125rem;
     font-weight: 500;
     color: var(--mymd-text-muted);
     transition: background 0.15s ease, color 0.15s ease;
@@ -442,14 +442,14 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    height: 30px;
-    padding: 0 10px;
+    height: 34px;
+    padding: 0 12px;
     border-radius: 8px;
     border: 1px solid transparent;
     background: none;
     cursor: pointer;
     color: var(--mymd-text-muted);
-    font-size: 0.72rem;
+    font-size: 0.8125rem;
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
     white-space: nowrap;
   }
@@ -466,10 +466,10 @@
   }
 
   .pill-action-icon {
-    width: 30px;
+    width: 34px;
     padding: 0;
     justify-content: center;
-    font-size: 0.875rem;
+    font-size: 1.1rem;
     margin-left: auto;
   }
 

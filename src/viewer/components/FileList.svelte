@@ -39,7 +39,7 @@
     {/each}
   </ul>
 {:else if isFileProtocol}
-  <div class="empty-state">No other .md files</div>
+  <div class="empty-state">当前目录暂无其他 .md 文件</div>
 {/if}
 
 <style>
