@@ -61,14 +61,12 @@
   <div class="popup">
     <!-- Header -->
     <header class="header">
-      <span class="logo">Md</span>
+      <div class="logo">M</div>
       <div class="brand-text">
         <span class="brand-name">mymd</span>
-        <span class="brand-sub">Beautiful Markdown Preview</span>
+        <span class="brand-sub">Markdown Preview</span>
       </div>
     </header>
-
-    <div class="divider" />
 
     <!-- Theme & Color Mode -->
     <section class="section">
@@ -92,24 +90,28 @@
             class:active={settings.colorMode === 'light'}
             on:click={() => { settings.colorMode = 'light'; settings = settings; persist() }}
             title="Light"
-          >☀️</button>
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41"/></svg>
+          </button>
           <button
             class="mode-btn"
             class:active={settings.colorMode === 'dark'}
             on:click={() => { settings.colorMode = 'dark'; settings = settings; persist() }}
             title="Dark"
-          >🌙</button>
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
           <button
             class="mode-btn"
             class:active={settings.colorMode === 'system'}
             on:click={() => { settings.colorMode = 'system'; settings = settings; persist() }}
-            title="System"
-          >🖥️</button>
+            title="Auto"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+          </button>
         </div>
       </div>
     </section>
-
-    <div class="divider" />
 
     <!-- Feature Toggles -->
     <section class="section">
@@ -155,8 +157,6 @@
       </div>
     </section>
 
-    <div class="divider" />
-
     <!-- Steppers -->
     <section class="section">
       <div class="row">
@@ -193,12 +193,16 @@
       </div>
     </section>
 
-    <div class="divider" />
-
     <!-- Footer Actions -->
     <footer class="footer">
-      <button class="action-btn" on:click={openFullSettings}>⚙ Full Settings</button>
-      <button class="action-btn" on:click={openTestPage}>📖 Open Test Page</button>
+      <button class="action-btn primary" on:click={openFullSettings}>
+        <svg class="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h12M2 8h12M2 13h12"/><circle cx="5" cy="3" r="1.5" fill="currentColor" stroke="none"/><circle cx="11" cy="8" r="1.5" fill="currentColor" stroke="none"/><circle cx="7" cy="13" r="1.5" fill="currentColor" stroke="none"/></svg>
+        All Settings
+      </button>
+      <button class="action-btn ghost" on:click={openTestPage}>
+        <svg class="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 9v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4"/><path d="M9 2h5v5M14 2 7 9"/></svg>
+        Test Page
+      </button>
     </footer>
   </div>
 {/if}
@@ -210,30 +214,35 @@
     font-family: system-ui, -apple-system, sans-serif;
     font-size: 13px;
     line-height: 1.4;
-    transition: background 0.2s, color 0.2s;
+    transition: background-color 0.2s, color 0.2s;
+    min-width: 280px;
   }
 
-  /* Header */
+  /* ─── Header ─── */
   .header {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 14px;
+    padding: 14px 16px 10px;
   }
 
   .logo {
-    width: 32px;
-    height: 32px;
-    border-radius: var(--mymd-radius-md, 8px);
-    background: var(--mymd-link, #0969da);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: linear-gradient(
+      135deg,
+      var(--mymd-link, #0969da),
+      color-mix(in srgb, var(--mymd-link, #0969da) 60%, #000)
+    );
     color: #fff;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
   }
 
   .brand-text {
@@ -243,29 +252,30 @@
   }
 
   .brand-name {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--mymd-heading, var(--mymd-text, #1a1a1a));
     line-height: 1.2;
+    letter-spacing: -0.01em;
   }
 
   .brand-sub {
     font-size: 11px;
     color: var(--mymd-text-secondary, #666);
+    letter-spacing: 0.01em;
   }
 
-  /* Divider */
-  .divider {
-    height: 1px;
-    background: var(--mymd-border, #e5e7eb);
-  }
-
-  /* Section */
+  /* ─── Section ─── */
   .section {
-    padding: 8px 14px;
+    padding: 8px 16px;
     display: flex;
     flex-direction: column;
     gap: 2px;
+  }
+
+  .section + .section {
+    padding-top: 4px;
+    border-top: 1px solid color-mix(in srgb, var(--mymd-border, #e5e7eb) 50%, transparent);
   }
 
   .row {
@@ -281,165 +291,235 @@
     flex: 1;
   }
 
-  /* Select */
+  /* ─── Select ─── */
   .select {
+    appearance: none;
+    -webkit-appearance: none;
     background: var(--mymd-bg, #ffffff);
     color: var(--mymd-text, #1a1a1a);
     border: 1px solid var(--mymd-border, #d0d5dd);
-    border-radius: var(--mymd-radius-sm, 4px);
-    padding: 4px 6px;
+    border-radius: 6px;
+    padding: 5px 28px 5px 10px;
     font-size: 12px;
     font-family: inherit;
     cursor: pointer;
     min-width: 110px;
-    transition: border-color 0.1s;
+    transition: border-color 0.15s, box-shadow 0.15s;
     outline: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+  }
+
+  .select:hover {
+    border-color: color-mix(in srgb, var(--mymd-link, #0969da) 40%, var(--mymd-border, #d0d5dd));
   }
 
   .select:focus {
     border-color: var(--mymd-link, #0969da);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--mymd-link, #0969da) 12%, transparent);
   }
 
-  /* Mode buttons */
+  /* ─── Mode Buttons (pill group) ─── */
   .mode-group {
     display: flex;
-    gap: 4px;
   }
 
   .mode-btn {
-    width: 30px;
-    height: 26px;
+    width: 32px;
+    height: 28px;
     border: 1px solid var(--mymd-border, #d0d5dd);
     background: transparent;
-    border-radius: var(--mymd-radius-sm, 4px);
     cursor: pointer;
-    font-size: 13px;
-    line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    transition: background 0.1s, border-color 0.1s;
-    color: var(--mymd-text, #1a1a1a);
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+    color: var(--mymd-text-secondary, #666);
+  }
+
+  .mode-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .mode-btn:first-child {
+    border-radius: 6px 0 0 6px;
+  }
+
+  .mode-btn:last-child {
+    border-radius: 0 6px 6px 0;
+  }
+
+  .mode-btn:not(:first-child) {
+    margin-left: -1px;
   }
 
   .mode-btn:hover {
-    background: var(--mymd-sidebar-bg, #f3f4f6);
+    background: color-mix(in srgb, var(--mymd-text, #1a1a1a) 5%, transparent);
   }
 
   .mode-btn.active {
-    background: var(--mymd-link, #0969da);
-    border-color: var(--mymd-link, #0969da);
+    background: color-mix(in srgb, var(--mymd-link, #0969da) 10%, transparent);
+    color: var(--mymd-link, #0969da);
+    border-color: color-mix(in srgb, var(--mymd-link, #0969da) 30%, transparent);
+    position: relative;
+    z-index: 1;
   }
 
-  /* Toggle switch */
+  /* ─── Toggle Switch ─── */
   .toggle {
     position: relative;
-    width: 36px;
-    height: 20px;
-    border-radius: 10px;
-    background: var(--mymd-border, #ccc);
+    width: 32px;
+    height: 18px;
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--mymd-border, #ccc) 80%, var(--mymd-bg, #fff));
     border: none;
     cursor: pointer;
     padding: 0;
     flex-shrink: 0;
-    transition: background 0.15s ease;
+    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .toggle.on {
-    background: var(--mymd-link, #0969da);
+    background: color-mix(in srgb, var(--mymd-link, #0969da) 85%, white);
   }
 
   .thumb {
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     background: #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    transition: transform 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     display: block;
     pointer-events: none;
   }
 
   .toggle.on .thumb {
-    transform: translateX(16px);
+    transform: translateX(14px);
   }
 
-  /* Stepper */
+  /* ─── Stepper ─── */
   .stepper {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
 
   .step-btn {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border: 1px solid var(--mymd-border, #d0d5dd);
-    background: var(--mymd-sidebar-bg, #f6f8fa);
-    color: var(--mymd-text, #1a1a1a);
-    border-radius: var(--mymd-radius-sm, 4px);
+    background: transparent;
+    color: var(--mymd-text-secondary, #666);
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    transition: background 0.1s;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s,
+      transform 0.15s, box-shadow 0.15s;
     font-family: inherit;
   }
 
   .step-btn:hover:not(:disabled) {
-    background: var(--mymd-border, #e5e7eb);
+    background: color-mix(in srgb, var(--mymd-link, #0969da) 8%, transparent);
+    border-color: color-mix(in srgb, var(--mymd-link, #0969da) 30%, var(--mymd-border, #d0d5dd));
+    color: var(--mymd-link, #0969da);
+    transform: translateY(-0.5px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   }
 
   .step-btn:disabled {
-    opacity: 0.35;
+    opacity: 0.3;
     cursor: not-allowed;
   }
 
   .step-val {
     font-size: 12px;
     color: var(--mymd-text-secondary, #666);
-    min-width: 40px;
+    min-width: 44px;
     text-align: center;
     font-variant-numeric: tabular-nums;
   }
 
-  /* Footer */
+  /* ─── Footer ─── */
   .footer {
-    padding: 8px 14px 10px;
+    padding: 8px 16px 12px;
     display: flex;
     gap: 8px;
+    border-top: 1px solid color-mix(in srgb, var(--mymd-border, #e5e7eb) 50%, transparent);
+    margin-top: 4px;
   }
 
   .action-btn {
     flex: 1;
-    padding: 6px 8px;
-    border: 1px solid var(--mymd-border, #d0d5dd);
-    background: var(--mymd-sidebar-bg, #f6f8fa);
-    color: var(--mymd-text, #1a1a1a);
-    border-radius: var(--mymd-radius-sm, 4px);
+    padding: 0 12px;
+    height: 32px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 12px;
+    font-weight: 500;
     font-family: inherit;
     text-align: center;
-    transition: background 0.1s;
+    transition: background-color 0.15s, border-color 0.15s, transform 0.15s,
+      box-shadow 0.15s;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
   }
 
   .action-btn:hover {
-    background: var(--mymd-border, #e5e7eb);
+    transform: translateY(-0.5px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   }
 
-  /* Respect reduced motion */
+  .action-btn.primary {
+    background: var(--mymd-link, #0969da);
+    color: #fff;
+    border: 1px solid transparent;
+  }
+
+  .action-btn.primary:hover {
+    background: color-mix(in srgb, var(--mymd-link, #0969da) 88%, #000);
+  }
+
+  .action-btn.ghost {
+    background: transparent;
+    color: var(--mymd-text-secondary, #666);
+    border: 1px solid var(--mymd-border, #d0d5dd);
+  }
+
+  .action-btn.ghost:hover {
+    background: color-mix(in srgb, var(--mymd-text, #1a1a1a) 4%, transparent);
+    border-color: color-mix(in srgb, var(--mymd-border, #d0d5dd) 70%, var(--mymd-text, #1a1a1a));
+  }
+
+  .btn-icon {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+  }
+
+  /* ─── Reduced Motion ─── */
   @media (prefers-reduced-motion: reduce) {
     .toggle,
-    .thumb {
+    .thumb,
+    .step-btn,
+    .action-btn,
+    .mode-btn,
+    .select,
+    .popup {
       transition: none;
     }
   }
