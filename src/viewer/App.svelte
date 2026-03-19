@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
   import Toolbar from './components/Toolbar.svelte'
   import MarkdownContent from './components/MarkdownContent.svelte'
   import ProgressBar from './components/ProgressBar.svelte'
@@ -8,6 +8,9 @@
   import FileList from './components/FileList.svelte'
   import Outline from './components/Outline.svelte'
   import SettingsPanel from './components/settings/SettingsPanel.svelte'
+  import FrontmatterBanner from './components/FrontmatterBanner.svelte'
+  import SourceView from './components/SourceView.svelte'
+  import ImagePreview from './components/ImagePreview.svelte'
   import { documentState } from './stores/document'
   import { settings, initSettings } from './stores/settings'
   import { showOutline, showFileList, showSource, scrollProgress } from './stores/ui'
@@ -16,6 +19,7 @@
   import { calculateStats } from '../lib/stats'
   import { applyTheme, resolveColorMode } from '../lib/theme/engine'
   import { getTheme } from '../lib/theme/themes'
+  import { loadLocal, saveLocal } from '../lib/storage'
   import type { Heading } from '../types'
   import './styles/base.css'
   import './styles/content.css'
@@ -24,6 +28,8 @@
   let error = ''
   let errorType: 'network' | 'notfound' | 'permission' | 'toolarge' = 'network'
   let mainContent: HTMLElement
+  let refreshInterval: ReturnType<typeof setInterval>
+  let scrollSaveTimeout: ReturnType<typeof setTimeout>
 
   function extractHeadings(html: string): Heading[] {
     const parser = new DOMParser()
@@ -84,6 +90,45 @@
     if (!mainContent) return
     const { scrollTop, scrollHeight, clientHeight } = mainContent
     $scrollProgress = Math.round((scrollTop / (scrollHeight - clientHeight)) * 100)
+    debouncedSaveScroll()
+  }
+
+  function debouncedSaveScroll() {
+    clearTimeout(scrollSaveTimeout)
+    scrollSaveTimeout = setTimeout(async () => {
+      if ($settings.rememberScrollPosition && $documentState.url) {
+        const positions = await loadLocal<Record<string, number>>('scrollPositions') ?? {}
+        positions[$documentState.url] = mainContent?.scrollTop ?? 0
+        await saveLocal('scrollPositions', positions)
+      }
+    }, 1000)
+  }
+
+  function startAutoRefresh() {
+    if (refreshInterval) clearInterval(refreshInterval)
+    if (!$settings.autoRefresh) return
+    refreshInterval = setInterval(async () => {
+      try {
+        const raw = await fetchContent($documentState.url)
+        if (raw && raw !== $documentState.rawMarkdown) {
+          const scrollPos = mainContent?.scrollTop ?? 0
+          await loadDocument()
+          if (mainContent) mainContent.scrollTop = scrollPos
+        }
+      } catch { /* ignore refresh errors */ }
+    }, $settings.autoRefreshInterval)
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    const { ctrlKey, shiftKey, key } = e
+    if (ctrlKey && shiftKey) {
+      if (key === 'O') { e.preventDefault(); showOutline.update(v => !v) }
+      if (key === 'S') { e.preventDefault(); showSource.update(v => !v) }
+      if (key === 'D') {
+        e.preventDefault()
+        settings.update(s => ({ ...s, colorMode: s.colorMode === 'dark' ? 'light' : 'dark' }))
+      }
+    }
   }
 
   // Apply theme reactively
@@ -96,6 +141,25 @@
   onMount(async () => {
     await initSettings()
     await loadDocument()
+
+    // Restore scroll position
+    if ($settings.rememberScrollPosition && $documentState.url) {
+      const positions = await loadLocal<Record<string, number>>('scrollPositions') ?? {}
+      const saved = positions[$documentState.url]
+      if (saved && mainContent) {
+        setTimeout(() => { mainContent.scrollTop = saved }, 100)
+      }
+    }
+
+    startAutoRefresh()
+    settings.subscribe(() => startAutoRefresh())
+    document.addEventListener('keydown', handleKeydown)
+  })
+
+  onDestroy(() => {
+    document.removeEventListener('keydown', handleKeydown)
+    if (refreshInterval) clearInterval(refreshInterval)
+    clearTimeout(scrollSaveTimeout)
   })
 </script>
 
@@ -114,8 +178,9 @@
     {/if}
     <main class="main-content" bind:this={mainContent} on:scroll={handleScroll}>
       {#if $showSource}
-        <pre class="source-view">{$documentState.rawMarkdown}</pre>
+        <SourceView />
       {:else}
+        <FrontmatterBanner />
         <MarkdownContent />
       {/if}
     </main>
@@ -127,4 +192,5 @@
   </div>
   <ScrollTop />
   <SettingsPanel />
+  <ImagePreview />
 {/if}
