@@ -18,9 +18,9 @@ import { mermaidPlugin } from './plugins/mermaid'
 import { wikilinkPlugin } from './plugins/wikilink'
 import DOMPurify from 'dompurify'
 
-// Register DOMPurify hook once at module level to allow Shiki's color styles on <span>
+// Register DOMPurify hook once at module level to allow Shiki's color styles on <span> and <pre>
 DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
-  if (data.attrName === 'style' && node.tagName === 'SPAN') {
+  if (data.attrName === 'style' && (node.tagName === 'SPAN' || node.tagName === 'PRE')) {
     const clean = data.attrValue
       .split(';')
       .filter(s => /^\s*(color|background-color)\s*:/.test(s))

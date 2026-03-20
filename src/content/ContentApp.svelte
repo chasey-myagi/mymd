@@ -1,16 +1,15 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
-  import FloatingPill from './components/FloatingPill.svelte'
-  import MarkdownContent from './components/MarkdownContent.svelte'
-  import ProgressBar from './components/ProgressBar.svelte'
-  import ScrollTop from './components/ScrollTop.svelte'
-  import ErrorPage from './components/ErrorPage.svelte'
-  import FrontmatterBanner from './components/FrontmatterBanner.svelte'
-  import SourceView from './components/SourceView.svelte'
-  import ImagePreview from './components/ImagePreview.svelte'
-  import { documentState } from './stores/document'
-  import { settings, initSettings } from './stores/settings'
-  import { showSource, scrollProgress } from './stores/ui'
+  import FloatingPill from '../viewer/components/FloatingPill.svelte'
+  import MarkdownContent from '../viewer/components/MarkdownContent.svelte'
+  import ProgressBar from '../viewer/components/ProgressBar.svelte'
+  import ScrollTop from '../viewer/components/ScrollTop.svelte'
+  import FrontmatterBanner from '../viewer/components/FrontmatterBanner.svelte'
+  import SourceView from '../viewer/components/SourceView.svelte'
+  import ImagePreview from '../viewer/components/ImagePreview.svelte'
+  import { documentState } from '../viewer/stores/document'
+  import { settings, initSettings } from '../viewer/stores/settings'
+  import { showSource, scrollProgress } from '../viewer/stores/ui'
   import { renderMarkdown } from '../lib/markdown/renderer'
   import { parseFrontmatter } from '../lib/frontmatter'
   import { calculateStats } from '../lib/stats'
@@ -18,18 +17,13 @@
   import { getTheme } from '../lib/theme/themes'
   import { loadLocal, saveLocal, loadSettings } from '../lib/storage'
   import type { Heading } from '../types'
-  import './styles/base.css'
-  import './styles/content.css'
-  import './styles/print.css'
+
+  export let rawText: string
+  export let fileUrl: string
 
   // Set URL immediately (before children mount) so FileList can access it in onMount
-  const initialUrl = new URLSearchParams(window.location.search).get('url') ?? ''
-  if (initialUrl) {
-    documentState.update(d => ({ ...d, url: initialUrl }))
-  }
+  documentState.update(d => ({ ...d, url: fileUrl }))
 
-  let error = ''
-  let errorType: 'network' | 'notfound' | 'permission' | 'toolarge' = 'network'
   let mainContent: HTMLElement
   let refreshInterval: ReturnType<typeof setInterval>
   let scrollSaveTimeout: ReturnType<typeof setTimeout>
@@ -49,50 +43,28 @@
     return headings
   }
 
-  async function fetchContent(url: string): Promise<string> {
-    const hasChromeApi = typeof chrome !== 'undefined' && chrome.runtime?.sendMessage
-
-    if (url.startsWith('file://') && hasChromeApi) {
-      return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ type: 'FETCH_FILE', url }, (response) => {
-          if (response?.success) resolve(response.content)
-          else reject(new Error(response?.error ?? 'Failed to load file'))
-        })
+  async function fetchFileContent(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: 'FETCH_FILE', url: fileUrl }, (response) => {
+        if (response?.success) resolve(response.content)
+        else reject(new Error(response?.error ?? 'Failed to load file'))
       })
-    }
-
-    if (hasChromeApi) {
-      return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ type: 'FETCH_URL', url }, (response) => {
-          if (response?.success) resolve(response.content)
-          else reject(new Error(response?.error ?? 'Failed to fetch'))
-        })
-      })
-    }
-
-    // Fallback: direct fetch (works outside extension context)
-    const res = await fetch(url)
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return res.text()
+    })
   }
 
-  async function loadDocument(): Promise<void> {
-    const params = new URLSearchParams(window.location.search)
-    const url = params.get('url')
-    if (!url) { error = 'No URL provided'; return }
-
+  async function loadDocument(raw?: string): Promise<void> {
     try {
-      const raw = await fetchContent(url)
-      if (!raw) { error = 'Empty document'; errorType = 'notfound'; return }
+      const text = raw ?? rawText
+      if (!text) return
 
-      const { data: fm, content } = parseFrontmatter(raw)
+      const { data: fm, content } = parseFrontmatter(text)
       const html = await renderMarkdown(content, getTheme($settings.theme, resolveColorMode($settings.colorMode)).codeTheme)
       const headings = extractHeadings(html)
       const stats = calculateStats(content)
 
       documentState.set({
-        url,
-        rawMarkdown: raw,
+        url: fileUrl,
+        rawMarkdown: text,
         renderedHTML: html,
         headings,
         frontmatter: fm,
@@ -100,7 +72,7 @@
         readingTime: stats.readingTime,
       })
     } catch (e) {
-      error = e instanceof Error ? e.message : 'Unknown error'
+      console.error('[mymd] Failed to render:', e)
     }
   }
 
@@ -115,9 +87,9 @@
   function debouncedSaveScroll() {
     clearTimeout(scrollSaveTimeout)
     scrollSaveTimeout = setTimeout(async () => {
-      if ($settings.rememberScrollPosition && $documentState.url) {
+      if ($settings.rememberScrollPosition && fileUrl) {
         const positions = await loadLocal<Record<string, number>>('scrollPositions') ?? {}
-        positions[$documentState.url] = mainContent?.scrollTop ?? 0
+        positions[fileUrl] = mainContent?.scrollTop ?? 0
         await saveLocal('scrollPositions', positions)
       }
     }, 1000)
@@ -128,10 +100,10 @@
     if (!$settings.autoRefresh) return
     refreshInterval = setInterval(async () => {
       try {
-        const raw = await fetchContent($documentState.url)
+        const raw = await fetchFileContent()
         if (raw && raw !== $documentState.rawMarkdown) {
           const scrollPos = mainContent?.scrollTop ?? 0
-          await loadDocument()
+          await loadDocument(raw)
           if (mainContent) mainContent.scrollTop = scrollPos
         }
       } catch { /* ignore refresh errors */ }
@@ -167,9 +139,9 @@
     await loadDocument()
 
     // Restore scroll position
-    if ($settings.rememberScrollPosition && $documentState.url) {
+    if ($settings.rememberScrollPosition && fileUrl) {
       const positions = await loadLocal<Record<string, number>>('scrollPositions') ?? {}
-      const saved = positions[$documentState.url]
+      const saved = positions[fileUrl]
       if (saved && mainContent) {
         setTimeout(() => { mainContent.scrollTop = saved }, 100)
       }
@@ -180,11 +152,9 @@
     document.addEventListener('keydown', handleKeydown)
 
     // Sync settings from Popup in real-time
-    if (typeof chrome !== 'undefined' && chrome.storage?.onChanged) {
-      chrome.storage.onChanged.addListener(() => {
-        loadSettings().then(s => settings.set(s))
-      })
-    }
+    chrome.storage.onChanged.addListener(() => {
+      loadSettings().then(s => settings.set(s))
+    })
   })
 
   onDestroy(() => {
@@ -195,23 +165,19 @@
   })
 </script>
 
-{#if error}
-  <ErrorPage {error} type={errorType} />
-{:else}
-  {#if $settings.showProgressBar}
-    <ProgressBar />
-  {/if}
-  <div class="layout">
-    <main class="main-content" bind:this={mainContent} on:scroll={handleScroll}>
-      {#if $showSource}
-        <SourceView />
-      {:else}
-        <FrontmatterBanner />
-        <MarkdownContent />
-      {/if}
-    </main>
-  </div>
-  <ScrollTop />
-  <FloatingPill />
-  <ImagePreview />
+{#if $settings.showProgressBar}
+  <ProgressBar />
 {/if}
+<div class="layout">
+  <main class="main-content" bind:this={mainContent} on:scroll={handleScroll}>
+    {#if $showSource}
+      <SourceView />
+    {:else}
+      <FrontmatterBanner />
+      <MarkdownContent />
+    {/if}
+  </main>
+</div>
+<ScrollTop />
+<FloatingPill />
+<ImagePreview />

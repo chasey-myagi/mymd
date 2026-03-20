@@ -8,9 +8,9 @@ export const typoraLight: MymdTheme = {
   cssVariables: {
     '--mymd-bg': '#ffffff',
     '--mymd-text': '#333333',
-    '--mymd-text-secondary': '#777777',
+    '--mymd-text-secondary': '#737373',
     '--mymd-heading': '#111111',
-    '--mymd-link': '#4183c4',
+    '--mymd-link': '#3574b2',
     '--mymd-link-hover': '#2c6fa0',
     '--mymd-border': '#e0e0e0',
     '--mymd-code-bg': '#f5f5f5',

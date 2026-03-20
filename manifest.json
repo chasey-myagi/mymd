@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "mymd",
   "description": "Beautiful, customizable Markdown preview for your browser",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "icons": {
     "16": "src/assets/icons/icon16.png",
     "48": "src/assets/icons/icon48.png",
@@ -29,7 +29,7 @@
     }
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+    "extension_pages": "script-src 'self'; object-src 'self'"
   },
   "permissions": [
     "activeTab",

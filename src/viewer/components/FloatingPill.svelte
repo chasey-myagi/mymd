@@ -319,7 +319,7 @@
     align-items: flex-start;
     gap: 8px;
     padding: 14px 12px 8px 16px;
-    border-bottom: 0.5px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 0.5px solid color-mix(in srgb, var(--mymd-border) 40%, transparent);
     z-index: 2;
     flex-shrink: 0;
   }
@@ -383,7 +383,7 @@
     border: 0.5px solid rgba(0, 0, 0, 0.08);
     cursor: pointer;
     padding: 7px 12px;
-    font-size: 0.8125rem;
+    font-size: 0.8rem;
     font-weight: 500;
     color: var(--mymd-text-muted);
     transition: background 0.15s ease, color 0.15s ease;
@@ -439,7 +439,7 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 2px 0;
+    padding: 4px 0;
     z-index: 2;
     scrollbar-width: thin;
     scrollbar-color: color-mix(in srgb, var(--mymd-border) 80%, transparent) transparent;
@@ -468,7 +468,7 @@
     align-items: center;
     gap: 4px;
     padding: 8px 12px 12px;
-    border-top: 0.5px solid rgba(0, 0, 0, 0.06);
+    border-top: 0.5px solid color-mix(in srgb, var(--mymd-border) 40%, transparent);
     flex-shrink: 0;
     z-index: 2;
   }
@@ -484,7 +484,7 @@
     background: none;
     cursor: pointer;
     color: var(--mymd-text-muted);
-    font-size: 0.8125rem;
+    font-size: 0.8rem;
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
     white-space: nowrap;
   }
@@ -500,12 +500,18 @@
     border-color: color-mix(in srgb, var(--mymd-link) 22%, transparent);
   }
 
-  .pill-action-icon {
-    width: 34px;
-    padding: 0;
-    justify-content: center;
-    font-size: 1.1rem;
-    margin-left: auto;
+  /* ─── Focus-visible for keyboard accessibility ── */
+  .pill-handle:focus-visible,
+  .pill-tab:focus-visible,
+  .pill-close:focus-visible,
+  .pill-action:focus-visible {
+    outline: 2px solid var(--mymd-link);
+    outline-offset: -2px;
+  }
+
+  .pill-handle:focus-visible {
+    outline-offset: 0;
+    border-radius: 18px;
   }
 
   /* ─── Reduced motion ─────────────────────────── */

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher } from 'svelte'
   import { documentState } from '../stores/document'
   import { settings } from '../stores/settings'
   import { parseDirectoryListing } from '../../lib/file-list'
@@ -7,28 +7,51 @@
 
   const dispatch = createEventDispatcher()
   let files: string[] = []
+  let fetched = false
 
   $: currentFile = decodeURIComponent($documentState.url.split('/').pop() ?? '')
   $: isFileProtocol = $documentState.url.startsWith('file://')
 
-  onMount(async () => {
-    if (!isFileProtocol) { dispatch('loaded', { count: 0 }); return }
-    const dirUrl = $documentState.url.substring(0, $documentState.url.lastIndexOf('/') + 1)
+  // Reactively fetch directory listing when URL is available
+  $: if (isFileProtocol && $documentState.url && !fetched) {
+    fetched = true
+    fetchFiles($documentState.url)
+  }
+
+  async function fetchFiles(url: string) {
+    const dirUrl = url.substring(0, url.lastIndexOf('/') + 1)
+    console.log('[mymd] FileList: fetching directory:', dirUrl)
     try {
-      const response = await new Promise<{ success: boolean; html?: string }>((resolve) => {
-        chrome.runtime.sendMessage({ type: 'LIST_DIRECTORY', url: dirUrl }, resolve)
+      const response = await new Promise<{ success: boolean; html?: string; error?: string }>((resolve, reject) => {
+        chrome.runtime.sendMessage({ type: 'LIST_DIRECTORY', url: dirUrl }, (resp) => {
+          if (chrome.runtime.lastError) {
+            reject(new Error(chrome.runtime.lastError.message))
+          } else {
+            resolve(resp)
+          }
+        })
       })
+      console.log('[mymd] FileList: response success:', response.success, 'html length:', response.html?.length, 'error:', response.error)
       if (response.success && response.html) {
         files = parseDirectoryListing(response.html)
+        console.log('[mymd] FileList: found files:', files)
       }
-    } catch { files = [] }
+    } catch (e) {
+      console.warn('[mymd] FileList: failed:', e)
+      files = []
+    }
     dispatch('loaded', { count: files.length })
-  })
+  }
 
   function openFile(filename: string) {
     const dirUrl = $documentState.url.substring(0, $documentState.url.lastIndexOf('/') + 1)
-    const viewerUrl = chrome.runtime.getURL('src/viewer/index.html')
-    window.location.href = `${viewerUrl}?url=${encodeURIComponent(dirUrl + filename)}`
+    if (isFileProtocol) {
+      // Navigate via background — content script can't directly navigate file:// URLs
+      chrome.runtime.sendMessage({ type: 'NAVIGATE_FILE', url: dirUrl + filename })
+    } else {
+      const viewerUrl = chrome.runtime.getURL('src/viewer/index.html')
+      window.location.href = `${viewerUrl}?url=${encodeURIComponent(dirUrl + filename)}`
+    }
   }
 </script>
 
@@ -48,7 +71,7 @@
   .file-items {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 4px 6px;
   }
 
   .file-items li button {
@@ -57,7 +80,7 @@
     cursor: pointer;
     width: 100%;
     text-align: left;
-    padding: 3px 8px;
+    padding: 4px 10px;
     font-size: 0.8rem;
     color: var(--mymd-text-muted);
     border-radius: var(--mymd-radius-sm, 4px);
@@ -66,12 +89,14 @@
     white-space: nowrap;
     display: block;
     max-width: 100%;
-    transition: background 0.1s, color 0.1s;
+    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
   }
 
   .file-items li.active button {
     color: var(--mymd-link);
-    background: color-mix(in srgb, var(--mymd-link) 10%, transparent);
+    background: color-mix(in srgb, var(--mymd-link) 6%, transparent);
+    box-shadow: inset 2px 0 0 var(--mymd-link);
+    font-weight: 500;
   }
 
   .file-items li button:hover {
@@ -79,8 +104,14 @@
     color: var(--mymd-text);
   }
 
+  .file-items li button:focus-visible {
+    outline: 2px solid var(--mymd-link);
+    outline-offset: -2px;
+    border-radius: var(--mymd-radius-sm, 4px);
+  }
+
   .empty-state {
-    padding: 0.5rem 0.75rem;
+    padding: 12px 14px;
     font-size: 0.8rem;
     color: var(--mymd-text-muted);
     font-style: italic;

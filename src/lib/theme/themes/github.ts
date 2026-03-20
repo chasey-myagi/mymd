@@ -63,7 +63,7 @@ export const githubDark: MymdTheme = {
     '--mymd-blockquote-border': '#30363d',
     '--mymd-table-border': '#30363d',
     '--mymd-table-stripe': '#161b22',
-    '--mymd-mark-bg': '#bb800926',
+    '--mymd-mark-bg': '#bb800966',
     '--mymd-selection-bg': '#264f78',
     '--mymd-sidebar-bg': '#010409',
     '--mymd-sidebar-text': '#e6edf3',

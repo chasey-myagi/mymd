@@ -52,7 +52,7 @@ export const cyberpunkDark: MymdTheme = {
   cssVariables: {
     '--mymd-bg': '#0a0a0f',
     '--mymd-text': '#c8d8e8',
-    '--mymd-text-secondary': '#5a7a8a',
+    '--mymd-text-secondary': '#6a8a9a',
     '--mymd-heading': '#00ffff',
     '--mymd-link': '#00ffff',
     '--mymd-link-hover': '#66ffff',

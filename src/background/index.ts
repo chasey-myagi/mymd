@@ -14,11 +14,6 @@ function getViewerUrl(originalUrl: string): string {
   return `${viewerUrl}?url=${encodeURIComponent(originalUrl)}`
 }
 
-// Set session storage access level for content scripts
-chrome.storage.session.setAccessLevel({
-  accessLevel: 'TRUSTED_AND_UNTRUSTED_CONTEXTS'
-}).catch(() => { /* ignore if already set */ })
-
 // Redirect HTTP/HTTPS .md URLs to viewer (file:// handled by content script)
 chrome.webNavigation.onBeforeNavigate.addListener(
   (details) => {
@@ -35,12 +30,14 @@ chrome.webNavigation.onBeforeNavigate.addListener(
   { url: [{ schemes: ['http', 'https'] }] }
 )
 
-// Handle content script messages (file:// raw text)
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === 'GET_FILE_CONTENT') {
-    // Content script sends the raw text from file:// page
-    sendResponse({ success: true })
-    return true
+// Handle messages from content script and viewer
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'NAVIGATE_FILE') {
+    // Content script requests navigation to a file:// URL
+    if (sender.tab?.id) {
+      chrome.tabs.update(sender.tab.id, { url: message.url })
+    }
+    return false
   }
 
   if (message.type === 'FETCH_URL') {
@@ -66,7 +63,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message.type === 'FETCH_FILE') {
-    // Viewer requests file:// content directly (used on refresh when session storage is empty)
+    // Content script or viewer requests file:// content (used for auto-refresh)
     try {
       const url = new URL(message.url)
       if (url.protocol !== 'file:') {

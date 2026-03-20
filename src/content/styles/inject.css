@@ -1,0 +1,6 @@
+/* Hide raw markdown text until content script finishes rendering.
+   Chrome injects content_scripts.css synchronously BEFORE JS runs,
+   so the user never sees the raw text flash. */
+html:not(.mymd-rendered) body {
+  opacity: 0 !important;
+}
