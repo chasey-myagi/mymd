@@ -105,4 +105,63 @@ describe('createRenderer', () => {
     expect(html).toContain('href="my-page"')
     expect(html).toContain('Display Text')
   })
+
+  describe('link_open rule', () => {
+    it('adds target=_blank and rel for external http(s) links', () => {
+      const html = md.render('[ext](https://example.com)')
+      expect(html).toContain('target="_blank"')
+      expect(html).toContain('rel="noopener noreferrer"')
+      expect(html).not.toContain('data-md-link')
+    })
+
+    it('does not add target=_blank for mailto/tel (browser handles)', () => {
+      const mailHtml = md.render('[mail](mailto:a@b.c)')
+      expect(mailHtml).not.toContain('target="_blank"')
+      expect(mailHtml).not.toContain('data-md-link')
+      const telHtml = md.render('[call](tel:+123)')
+      expect(telHtml).not.toContain('target="_blank"')
+    })
+
+    it('adds target=_blank for ftp links', () => {
+      const html = md.render('[ftp](ftp://example.com/file.zip)')
+      expect(html).toContain('target="_blank"')
+      expect(html).toContain('rel="noopener noreferrer"')
+    })
+
+    it('tags relative .md links with data-md-link and no target', () => {
+      const html = md.render('[doc](./other.md)')
+      expect(html).toContain('data-md-link="true"')
+      expect(html).not.toContain('target="_blank"')
+    })
+
+    it('tags absolute http .md links with data-md-link, no target', () => {
+      // External .md should be routed through the viewer, not opened raw
+      // in a new tab.
+      const html = md.render('[doc](https://example.com/x.md)')
+      expect(html).toContain('data-md-link="true"')
+      expect(html).not.toContain('target="_blank"')
+    })
+
+    it('does not tag pure anchors', () => {
+      const html = md.render('[top](#section)')
+      expect(html).not.toContain('data-md-link')
+      expect(html).not.toContain('target="_blank"')
+    })
+
+    it('does not tag wikilinks (the click handler matches on class)', () => {
+      const html = md.render('[[other-page]]')
+      expect(html).toContain('class="wikilink"')
+      expect(html).not.toContain('data-md-link')
+      expect(html).not.toContain('target="_blank"')
+    })
+
+    it('tags linkified bare .md URLs as data-md-link (regression)', () => {
+      // markdown-it's linkify auto-converts bare URLs into anchors; the
+      // link_open rule must still treat the resulting href as a markdown
+      // link, not as a generic external link.
+      const html = md.render('See https://example.com/x.md for details')
+      expect(html).toContain('data-md-link="true"')
+      expect(html).not.toContain('target="_blank"')
+    })
+  })
 })

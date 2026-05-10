@@ -16,6 +16,7 @@ import { alert } from '@mdit/plugin-alert'
 import katex from '@traptitech/markdown-it-katex'
 import { mermaidPlugin } from './plugins/mermaid'
 import { wikilinkPlugin } from './plugins/wikilink'
+import { hasMdExtension, isAnchorOnly, isSafeExternal } from './links'
 import DOMPurify from 'dompurify'
 
 // Register DOMPurify hook once at module level to allow Shiki's color styles on <span> and <pre>
@@ -55,6 +56,38 @@ export function createRenderer(): MarkdownIt {
     .use(katex, { throwOnError: false })
     .use(mermaidPlugin)
     .use(wikilinkPlugin)
+
+  // Tag anchors so the click handler can route .md/wikilink navigation
+  // through the extension, and harden external links.
+  const defaultLinkOpen =
+    md.renderer.rules.link_open ??
+    function (tokens, idx, options, env, self) {
+      return self.renderToken(tokens, idx, options)
+    }
+  md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+    const token = tokens[idx]
+    const href = token.attrGet('href') ?? ''
+    const cls = token.attrGet('class') ?? ''
+    const isWikilink = cls.split(/\s+/).includes('wikilink')
+
+    // Wikilinks already carry the `wikilink` class; the click handler
+    // matches on that. Skip further annotation to avoid double-tagging.
+    if (!isWikilink && href && !isAnchorOnly(href)) {
+      if (hasMdExtension(href)) {
+        // Markdown file link — click handler intercepts and routes through
+        // the extension viewer / NAVIGATE_FILE messaging.
+        token.attrSet('data-md-link', 'true')
+      } else if (isSafeExternal(href)) {
+        // http(s)/ftp link — open in a new tab with a safe rel.
+        // mailto:/tel: are deliberately left to browser default; javascript:
+        // is filtered earlier by markdown-it/DOMPurify but we don't tag it.
+        token.attrSet('target', '_blank')
+        token.attrSet('rel', 'noopener noreferrer')
+      }
+    }
+
+    return defaultLinkOpen(tokens, idx, options, env, self)
+  }
 
   // Add heading IDs for anchor links (with per-render deduplication via env)
   const defaultHeadingOpen = md.renderer.rules.heading_open
