@@ -5,14 +5,74 @@
   import { afterUpdate, onMount } from 'svelte'
   import { get } from 'svelte/store'
   import { t } from '../../lib/i18n'
+  import { resolveMarkdownHref } from '../../lib/markdown/links'
   import mermaid from 'mermaid'
 
   let contentEl: HTMLElement
 
-  onMount(() => {
-    contentEl.addEventListener('click', (e) => {
-      const img = (e.target as HTMLElement).closest('img')
+  function navigateToMarkdown(url: string, newTab: boolean) {
+    const hasChromeApi = typeof chrome !== 'undefined' && !!chrome.runtime?.sendMessage
+
+    if (url.startsWith('file://')) {
+      if (newTab) {
+        // Best-effort: most browsers block file:// in window.open from
+        // chrome-extension pages, but try anyway. Same-tab path uses the
+        // background's tabs.update, which works.
+        window.open(url, '_blank')
+      } else if (hasChromeApi) {
+        chrome.runtime.sendMessage({ type: 'NAVIGATE_FILE', url })
+      } else {
+        window.location.href = url
+      }
+      return
+    }
+
+    // http/https (or anything else) — route through the viewer when we
+    // have access to the extension; the background's webNavigation
+    // listener also redirects, but going direct avoids a flash.
+    const target = hasChromeApi
+      ? `${chrome.runtime.getURL('src/viewer/index.html')}?url=${encodeURIComponent(url)}`
+      : url
+
+    if (newTab) {
+      window.open(target, '_blank')
+    } else {
+      window.location.href = target
+    }
+  }
+
+  function handleContentClick(e: MouseEvent) {
+    const targetEl = e.target as HTMLElement
+    const anchor = targetEl.closest('a') as HTMLAnchorElement | null
+
+    // Image preview (existing behavior, only when not clicking a link)
+    if (!anchor) {
+      const img = targetEl.closest('img')
       if (img) previewImageSrc.set((img as HTMLImageElement).src)
+      return
+    }
+
+    const isWikilink = anchor.classList.contains('wikilink')
+    const isMdLink = anchor.hasAttribute('data-md-link')
+    if (!isWikilink && !isMdLink) return // external/anchor links: browser default
+
+    const href = anchor.getAttribute('href')
+    if (!href) return
+
+    const docUrl = get(documentState).url
+    const resolved = resolveMarkdownHref(href, docUrl, isWikilink)
+    if (!resolved) return // Couldn't resolve — fall through to default
+
+    e.preventDefault()
+    const newTab = e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1
+    navigateToMarkdown(resolved, newTab)
+  }
+
+  onMount(() => {
+    contentEl.addEventListener('click', handleContentClick)
+    // Middle-click fires `auxclick`, not `click`, in modern browsers.
+    contentEl.addEventListener('auxclick', (e) => {
+      if ((e as MouseEvent).button === 1) handleContentClick(e as MouseEvent)
     })
   })
 

@@ -105,4 +105,46 @@ describe('createRenderer', () => {
     expect(html).toContain('href="my-page"')
     expect(html).toContain('Display Text')
   })
+
+  describe('link_open rule', () => {
+    it('adds target=_blank and rel for external http(s) links', () => {
+      const html = md.render('[ext](https://example.com)')
+      expect(html).toContain('target="_blank"')
+      expect(html).toContain('rel="noopener noreferrer"')
+      expect(html).not.toContain('data-md-link')
+    })
+
+    it('adds the same hardening for mailto links', () => {
+      const html = md.render('[mail](mailto:a@b.c)')
+      expect(html).toContain('target="_blank"')
+      expect(html).toContain('rel="noopener noreferrer"')
+    })
+
+    it('tags relative .md links with data-md-link and no target', () => {
+      const html = md.render('[doc](./other.md)')
+      expect(html).toContain('data-md-link="true"')
+      expect(html).not.toContain('target="_blank"')
+    })
+
+    it('tags absolute http .md links with data-md-link, no target', () => {
+      // External .md should be routed through the viewer, not opened raw
+      // in a new tab.
+      const html = md.render('[doc](https://example.com/x.md)')
+      expect(html).toContain('data-md-link="true"')
+      expect(html).not.toContain('target="_blank"')
+    })
+
+    it('does not tag pure anchors', () => {
+      const html = md.render('[top](#section)')
+      expect(html).not.toContain('data-md-link')
+      expect(html).not.toContain('target="_blank"')
+    })
+
+    it('does not tag wikilinks (the click handler matches on class)', () => {
+      const html = md.render('[[other-page]]')
+      expect(html).toContain('class="wikilink"')
+      expect(html).not.toContain('data-md-link')
+      expect(html).not.toContain('target="_blank"')
+    })
+  })
 })
