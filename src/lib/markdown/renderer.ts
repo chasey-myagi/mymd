@@ -16,7 +16,7 @@ import { alert } from '@mdit/plugin-alert'
 import katex from '@traptitech/markdown-it-katex'
 import { mermaidPlugin } from './plugins/mermaid'
 import { wikilinkPlugin } from './plugins/wikilink'
-import { hasExplicitProtocol, hasMdExtension, isAnchorOnly } from './links'
+import { hasMdExtension, isAnchorOnly, isSafeExternal } from './links'
 import DOMPurify from 'dompurify'
 
 // Register DOMPurify hook once at module level to allow Shiki's color styles on <span> and <pre>
@@ -77,8 +77,10 @@ export function createRenderer(): MarkdownIt {
         // Markdown file link — click handler intercepts and routes through
         // the extension viewer / NAVIGATE_FILE messaging.
         token.attrSet('data-md-link', 'true')
-      } else if (hasExplicitProtocol(href)) {
-        // External non-md link — open in a new tab with a safe rel.
+      } else if (isSafeExternal(href)) {
+        // http(s)/ftp link — open in a new tab with a safe rel.
+        // mailto:/tel: are deliberately left to browser default; javascript:
+        // is filtered earlier by markdown-it/DOMPurify but we don't tag it.
         token.attrSet('target', '_blank')
         token.attrSet('rel', 'noopener noreferrer')
       }

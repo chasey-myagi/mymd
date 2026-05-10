@@ -114,8 +114,16 @@ describe('createRenderer', () => {
       expect(html).not.toContain('data-md-link')
     })
 
-    it('adds the same hardening for mailto links', () => {
-      const html = md.render('[mail](mailto:a@b.c)')
+    it('does not add target=_blank for mailto/tel (browser handles)', () => {
+      const mailHtml = md.render('[mail](mailto:a@b.c)')
+      expect(mailHtml).not.toContain('target="_blank"')
+      expect(mailHtml).not.toContain('data-md-link')
+      const telHtml = md.render('[call](tel:+123)')
+      expect(telHtml).not.toContain('target="_blank"')
+    })
+
+    it('adds target=_blank for ftp links', () => {
+      const html = md.render('[ftp](ftp://example.com/file.zip)')
       expect(html).toContain('target="_blank"')
       expect(html).toContain('rel="noopener noreferrer"')
     })

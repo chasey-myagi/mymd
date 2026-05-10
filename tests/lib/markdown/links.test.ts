@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import {
-  hasExplicitProtocol,
   hasMdExtension,
   isAnchorOnly,
+  isSafeExternal,
   resolveMarkdownHref,
 } from '../../../src/lib/markdown/links'
 
@@ -42,20 +42,25 @@ describe('isAnchorOnly', () => {
   })
 })
 
-describe('hasExplicitProtocol', () => {
-  it('detects common protocols', () => {
-    expect(hasExplicitProtocol('http://x')).toBe(true)
-    expect(hasExplicitProtocol('https://x')).toBe(true)
-    expect(hasExplicitProtocol('mailto:a@b.c')).toBe(true)
-    expect(hasExplicitProtocol('tel:+1')).toBe(true)
-    expect(hasExplicitProtocol('file:///x')).toBe(true)
+describe('isSafeExternal', () => {
+  it('matches http(s) and ftp', () => {
+    expect(isSafeExternal('http://x')).toBe(true)
+    expect(isSafeExternal('https://x')).toBe(true)
+    expect(isSafeExternal('HTTPS://X')).toBe(true)
+    expect(isSafeExternal('ftp://x')).toBe(true)
+  })
+
+  it('rejects mailto/tel/javascript/file', () => {
+    expect(isSafeExternal('mailto:a@b.c')).toBe(false)
+    expect(isSafeExternal('tel:+1')).toBe(false)
+    expect(isSafeExternal('javascript:alert(1)')).toBe(false)
+    expect(isSafeExternal('file:///x')).toBe(false)
   })
 
   it('rejects relative paths and anchors', () => {
-    expect(hasExplicitProtocol('./foo.md')).toBe(false)
-    expect(hasExplicitProtocol('foo/bar.md')).toBe(false)
-    expect(hasExplicitProtocol('#anchor')).toBe(false)
-    expect(hasExplicitProtocol('//example.com')).toBe(false) // protocol-relative — caller's choice
+    expect(isSafeExternal('./foo.md')).toBe(false)
+    expect(isSafeExternal('foo/bar.md')).toBe(false)
+    expect(isSafeExternal('#anchor')).toBe(false)
   })
 })
 
@@ -95,11 +100,20 @@ describe('resolveMarkdownHref', () => {
       .toBe('file:///home/user/notes/subdir/page.md')
   })
 
-  it('keeps wikilinks that already have an extension', () => {
+  it('keeps wikilinks that already have a markdown extension', () => {
     expect(resolveMarkdownHref('page.md', fileBase, true))
       .toBe('file:///home/user/notes/page.md')
-    expect(resolveMarkdownHref('image.png', fileBase, true))
-      .toBe('file:///home/user/notes/image.png')
+    expect(resolveMarkdownHref('page.MARKDOWN', fileBase, true))
+      .toBe('file:///home/user/notes/page.MARKDOWN')
+  })
+
+  it('still appends .md to wikilinks with non-markdown extensions', () => {
+    // Names like `v1.2` or `2024.01.05 notes` look like extensions to a
+    // naive regex but are still markdown page references.
+    expect(resolveMarkdownHref('v1.2', fileBase, true))
+      .toBe('file:///home/user/notes/v1.2.md')
+    expect(resolveMarkdownHref('2024.01.05 notes', fileBase, true))
+      .toBe('file:///home/user/notes/2024.01.05%20notes.md')
   })
 
   it('preserves fragment when appending .md to wikilink', () => {
