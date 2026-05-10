@@ -34,7 +34,8 @@ export function resolveMarkdownHref(
   if (!trimmed) return null
 
   let target = trimmed
-  if (isWikilink) {
+  if (isWikilink && !target.startsWith('#')) {
+    // [[#section]] is an in-page anchor — leave it alone.
     const hashIdx = target.indexOf('#')
     const path = hashIdx >= 0 ? target.slice(0, hashIdx) : target
     const fragment = hashIdx >= 0 ? target.slice(hashIdx) : ''
@@ -42,7 +43,7 @@ export function resolveMarkdownHref(
     // markdown extension. Names like `v1.2` or `2024.01.05 notes` look
     // like they have an extension to a naive regex but are still markdown
     // page references in Obsidian-style wikilinks.
-    if (path && !MD_EXTENSION_PATH_RE.test(path)) {
+    if (!MD_EXTENSION_PATH_RE.test(path)) {
       target = `${path}.md${fragment}`
     }
   }

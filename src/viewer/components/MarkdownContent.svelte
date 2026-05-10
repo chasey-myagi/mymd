@@ -72,13 +72,16 @@
     if (!href) return
 
     const docUrl = get(documentState).url
-    if (!docUrl) return // No base URL — let the browser do whatever it would
+    // Without a base URL the browser would resolve relative hrefs against
+    // chrome-extension:// (in viewer) and land on a 404. Swallow the
+    // click — same as the resolution-failure case below.
+    if (!docUrl) {
+      e.preventDefault()
+      return
+    }
 
     const resolved = resolveMarkdownHref(href, docUrl, isWikilink)
     if (!resolved) {
-      // We know this is a wikilink/.md link but couldn't resolve it.
-      // Swallow the click rather than letting the browser navigate
-      // against the wrong base (chrome-extension://...).
       e.preventDefault()
       return
     }

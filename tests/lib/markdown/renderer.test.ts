@@ -154,5 +154,14 @@ describe('createRenderer', () => {
       expect(html).not.toContain('data-md-link')
       expect(html).not.toContain('target="_blank"')
     })
+
+    it('tags linkified bare .md URLs as data-md-link (regression)', () => {
+      // markdown-it's linkify auto-converts bare URLs into anchors; the
+      // link_open rule must still treat the resulting href as a markdown
+      // link, not as a generic external link.
+      const html = md.render('See https://example.com/x.md for details')
+      expect(html).toContain('data-md-link="true"')
+      expect(html).not.toContain('target="_blank"')
+    })
   })
 })
