@@ -14,14 +14,15 @@ export function normalizeFetchUrl(url: string): string {
     return url
   }
 
-  // GitHub blob/raw page → raw.githubusercontent.com
-  // https://github.com/{owner}/{repo}/blob/{branch}/{path...}
-  // The {branch}/{path} layout is identical on raw.githubusercontent.com, so a
-  // branch containing slashes still maps correctly.
+  // GitHub blob page → the github.com /raw/ endpoint (NOT raw.githubusercontent
+  // directly). github.com honours the logged-in session cookie and 302-redirects
+  // to raw.githubusercontent.com — adding a ?token= for private repos — which the
+  // fetch follows. raw.githubusercontent.com on its own returns 404 for private
+  // repos because it only accepts that token, not cookies.
   if (u.hostname === 'github.com') {
-    const m = u.pathname.match(/^\/([^/]+)\/([^/]+)\/(?:blob|raw)\/(.+)$/)
+    const m = u.pathname.match(/^\/([^/]+)\/([^/]+)\/blob\/(.+)$/)
     if (m) {
-      return `https://raw.githubusercontent.com/${m[1]}/${m[2]}/${m[3]}${u.search}`
+      return `https://github.com/${m[1]}/${m[2]}/raw/${m[3]}${u.search}`
     }
   }
 
@@ -56,6 +57,22 @@ export function originPattern(url: string): string | null {
   } catch {
     return null
   }
+}
+
+/**
+ * Every host-permission pattern a fetch of `target` may need — including hosts
+ * reached via redirect. A github.com /raw/ request 302s to
+ * raw.githubusercontent.com, and the extension needs permission for that hop
+ * too, so both are required up front. Returns [] for non-http(s) URLs.
+ */
+export function requiredOrigins(target: string): string[] {
+  const base = originPattern(target)
+  if (!base) return []
+  const { hostname } = new URL(target)
+  if (hostname === 'github.com') {
+    return [base, 'https://raw.githubusercontent.com/*']
+  }
+  return [base]
 }
 
 /** Bare hostname for display, or the input unchanged if it can't be parsed. */

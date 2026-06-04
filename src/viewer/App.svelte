@@ -31,7 +31,7 @@
 
   let error = ''
   let errorType: 'network' | 'notfound' | 'permission' | 'toolarge' = 'network'
-  let permissionOrigin = ''
+  let permissionOrigins: string[] = []
   let permissionHost = ''
   let mainContent: HTMLElement
   let refreshInterval: ReturnType<typeof setInterval>
@@ -72,7 +72,7 @@
           } else if (response?.code === 'PERMISSION_REQUIRED') {
             const e = new Error(response.error ?? 'Permission required') as PermissionError
             e.code = 'PERMISSION_REQUIRED'
-            e.origin = response.origin
+            e.origins = response.origins
             e.host = response.host
             reject(e)
           } else {
@@ -88,15 +88,15 @@
     return res.text()
   }
 
-  type PermissionError = Error & { code?: string; origin?: string; host?: string }
+  type PermissionError = Error & { code?: string; origins?: string[]; host?: string }
 
   async function grantPermission(): Promise<void> {
-    if (!permissionOrigin || !chrome?.permissions?.request) return
+    if (!permissionOrigins.length || !chrome?.permissions?.request) return
     try {
-      const granted = await chrome.permissions.request({ origins: [permissionOrigin] })
+      const granted = await chrome.permissions.request({ origins: permissionOrigins })
       if (!granted) return
       error = ''
-      permissionOrigin = ''
+      permissionOrigins = []
       permissionHost = ''
       await loadDocument()
       startAutoRefresh()
@@ -132,7 +132,7 @@
       const pe = e as PermissionError
       if (pe?.code === 'PERMISSION_REQUIRED') {
         errorType = 'permission'
-        permissionOrigin = pe.origin ?? ''
+        permissionOrigins = pe.origins ?? []
         permissionHost = pe.host ?? ''
         error = pe.message
       } else {
@@ -237,7 +237,7 @@
   <ErrorPage
     {error}
     type={errorType}
-    {permissionOrigin}
+    {permissionOrigins}
     host={permissionHost}
     lang={$settings.language}
     onGrant={grantPermission}

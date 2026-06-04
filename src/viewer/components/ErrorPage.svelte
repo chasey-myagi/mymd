@@ -3,14 +3,18 @@
 
   export let error: string
   export let type: 'network' | 'notfound' | 'permission' | 'toolarge' = 'network'
-  // Host-permission grant flow (http/https). When set, this is a missing
+  // Host-permission grant flow (http/https). When non-empty, this is a missing
   // host-permission rather than the file:// "allow file URLs" case.
-  export let permissionOrigin = ''
+  export let permissionOrigins: string[] = []
   export let host = ''
   export let lang: Language = 'zh'
   export let onGrant: (() => void) | undefined = undefined
 
-  $: needsHostGrant = type === 'permission' && !!permissionOrigin
+  $: needsHostGrant = type === 'permission' && permissionOrigins.length > 0
+  // "https://github.com/*" → "github.com"
+  $: grantHosts = permissionOrigins
+    .map((o) => o.replace(/^https?:\/\//, '').replace(/\/\*$/, ''))
+    .join(', ')
 
   function retry() {
     window.location.reload()
@@ -21,7 +25,7 @@
   {#if needsHostGrant}
     <h1>{t('permNeeded', lang)}</h1>
     <p>{t('permPrompt', lang)}</p>
-    <p class="host">{host}</p>
+    <p class="host">{grantHosts}</p>
     <button on:click={() => onGrant?.()}>{t('permGrant', lang)} {host}</button>
     <p class="hint">{t('permHint', lang)}</p>
   {:else}

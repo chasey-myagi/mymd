@@ -1,26 +1,27 @@
 import { describe, it, expect } from 'vitest'
-import { normalizeFetchUrl, originPattern, hostnameOf } from '../../src/lib/url'
+import { normalizeFetchUrl, originPattern, requiredOrigins, hostnameOf } from '../../src/lib/url'
 
 describe('normalizeFetchUrl', () => {
-  it('rewrites a GitHub blob page to raw.githubusercontent.com', () => {
+  it('rewrites a GitHub blob page to the github.com /raw/ endpoint', () => {
+    // Routed through github.com (not raw.githubusercontent directly) so the
+    // session cookie can authenticate private repos.
     expect(
       normalizeFetchUrl('https://github.com/NousResearch/hermes-agent/blob/main/README.zh-CN.md')
-    ).toBe('https://raw.githubusercontent.com/NousResearch/hermes-agent/main/README.zh-CN.md')
-  })
-
-  it('rewrites a GitHub /raw/ page to raw.githubusercontent.com', () => {
-    expect(
-      normalizeFetchUrl('https://github.com/owner/repo/raw/main/docs/x.md')
-    ).toBe('https://raw.githubusercontent.com/owner/repo/main/docs/x.md')
+    ).toBe('https://github.com/NousResearch/hermes-agent/raw/main/README.zh-CN.md')
   })
 
   it('keeps branch names that contain slashes intact', () => {
     expect(
       normalizeFetchUrl('https://github.com/o/r/blob/feature/foo/dir/x.md')
-    ).toBe('https://raw.githubusercontent.com/o/r/feature/foo/dir/x.md')
+    ).toBe('https://github.com/o/r/raw/feature/foo/dir/x.md')
   })
 
-  it('leaves an already-raw URL untouched', () => {
+  it('leaves an already github.com /raw/ URL untouched', () => {
+    const raw = 'https://github.com/o/r/raw/main/x.md'
+    expect(normalizeFetchUrl(raw)).toBe(raw)
+  })
+
+  it('leaves a raw.githubusercontent.com URL untouched', () => {
     const raw = 'https://raw.githubusercontent.com/o/r/main/x.md'
     expect(normalizeFetchUrl(raw)).toBe(raw)
   })
@@ -53,6 +54,28 @@ describe('originPattern', () => {
   it('returns null for non-http(s) and invalid URLs', () => {
     expect(originPattern('file:///tmp/x.md')).toBeNull()
     expect(originPattern('nonsense')).toBeNull()
+  })
+})
+
+describe('requiredOrigins', () => {
+  it('requires both github.com and raw.githubusercontent.com for a github /raw/ URL', () => {
+    expect(requiredOrigins('https://github.com/o/r/raw/main/x.md')).toEqual([
+      'https://github.com/*',
+      'https://raw.githubusercontent.com/*',
+    ])
+  })
+
+  it('requires only the single origin for other hosts', () => {
+    expect(requiredOrigins('https://gitlab.com/g/r/-/raw/main/x.md')).toEqual([
+      'https://gitlab.com/*',
+    ])
+    expect(requiredOrigins('https://raw.githubusercontent.com/o/r/main/x.md')).toEqual([
+      'https://raw.githubusercontent.com/*',
+    ])
+  })
+
+  it('returns [] for non-http(s) URLs', () => {
+    expect(requiredOrigins('file:///tmp/x.md')).toEqual([])
   })
 })
 
