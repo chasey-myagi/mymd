@@ -46,6 +46,12 @@ const messages = {
     serif: '衬线',
     monospace: '等宽',
     width: '宽度',
+    permNeeded: '需要授权',
+    permGrant: '授权访问',
+    permPrompt: '预览该页面需要访问以下网站的权限：',
+    permHint: '授权后仅本站点生效，可随时在扩展设置中撤销。',
+    retry: '重试',
+    fileUrlHint: '请在 chrome://extensions 中为 mymd 启用「允许访问文件网址」。',
   },
   en: {
     openPanel: 'Open Panel',
@@ -92,6 +98,12 @@ const messages = {
     serif: 'Serif',
     monospace: 'Monospace',
     width: 'Width',
+    permNeeded: 'Permission needed',
+    permGrant: 'Grant access to',
+    permPrompt: 'mymd needs permission to fetch this page from:',
+    permHint: 'Access is scoped to this site only and can be revoked anytime in extension settings.',
+    retry: 'Retry',
+    fileUrlHint: 'Please enable "Allow access to file URLs" for mymd in chrome://extensions.',
   },
 } as const
 

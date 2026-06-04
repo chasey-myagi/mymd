@@ -1,3 +1,5 @@
+import { normalizeFetchUrl, originPattern, hostnameOf } from '../lib/url'
+
 const MD_EXTENSIONS = /\.(md|mkd|mdx|markdown)(\?.*)?$/i
 
 function isMarkdownUrl(url: string): boolean {
@@ -42,23 +44,45 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === 'FETCH_URL') {
     // Viewer requests content fetch for http/https
+    let target: string
+    let pattern: string | null
     try {
       const url = new URL(message.url)
       if (!['http:', 'https:'].includes(url.protocol)) {
         sendResponse({ success: false, error: 'Only HTTP/HTTPS URLs allowed' })
         return true
       }
+      // Rewrite blob pages → raw content, then derive the host we must reach.
+      target = normalizeFetchUrl(message.url)
+      pattern = originPattern(target)
     } catch {
       sendResponse({ success: false, error: 'Invalid URL' })
       return true
     }
-    fetch(message.url)
-      .then(res => {
+
+    ;(async () => {
+      // A service-worker fetch only bypasses CORS for hosts in our *granted*
+      // permissions. http/https are optional (manifest optional_host_permissions)
+      // and requested per-site at runtime, so check before fetching — otherwise
+      // the request is a plain cross-origin fetch and CORS blocks it.
+      if (pattern && !(await chrome.permissions.contains({ origins: [pattern] }))) {
+        sendResponse({
+          success: false,
+          code: 'PERMISSION_REQUIRED',
+          origin: pattern,
+          host: hostnameOf(target),
+          error: `Permission required for ${hostnameOf(target)}`,
+        })
+        return
+      }
+      try {
+        const res = await fetch(target)
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.text()
-      })
-      .then(text => sendResponse({ success: true, content: text }))
-      .catch(err => sendResponse({ success: false, error: err.message }))
+        sendResponse({ success: true, content: await res.text() })
+      } catch (err) {
+        sendResponse({ success: false, error: err instanceof Error ? err.message : 'Fetch failed' })
+      }
+    })()
     return true // async response
   }
 

@@ -17,6 +17,7 @@
   import { applyTheme, applyCustomCSS, resolveColorMode } from '../lib/theme/engine'
   import { getTheme } from '../lib/theme/themes'
   import { loadLocal, saveLocal, loadSettings } from '../lib/storage'
+  import { normalizeFetchUrl } from '../lib/url'
   import type { Heading } from '../types'
   import './styles/base.css'
   import './styles/content.css'
@@ -30,6 +31,8 @@
 
   let error = ''
   let errorType: 'network' | 'notfound' | 'permission' | 'toolarge' = 'network'
+  let permissionOrigin = ''
+  let permissionHost = ''
   let mainContent: HTMLElement
   let refreshInterval: ReturnType<typeof setInterval>
   let scrollSaveTimeout: ReturnType<typeof setTimeout>
@@ -64,16 +67,42 @@
     if (hasChromeApi) {
       return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage({ type: 'FETCH_URL', url }, (response) => {
-          if (response?.success) resolve(response.content)
-          else reject(new Error(response?.error ?? 'Failed to fetch'))
+          if (response?.success) {
+            resolve(response.content)
+          } else if (response?.code === 'PERMISSION_REQUIRED') {
+            const e = new Error(response.error ?? 'Permission required') as PermissionError
+            e.code = 'PERMISSION_REQUIRED'
+            e.origin = response.origin
+            e.host = response.host
+            reject(e)
+          } else {
+            reject(new Error(response?.error ?? 'Failed to fetch'))
+          }
         })
       })
     }
 
     // Fallback: direct fetch (works outside extension context)
-    const res = await fetch(url)
+    const res = await fetch(normalizeFetchUrl(url))
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return res.text()
+  }
+
+  type PermissionError = Error & { code?: string; origin?: string; host?: string }
+
+  async function grantPermission(): Promise<void> {
+    if (!permissionOrigin || !chrome?.permissions?.request) return
+    try {
+      const granted = await chrome.permissions.request({ origins: [permissionOrigin] })
+      if (!granted) return
+      error = ''
+      permissionOrigin = ''
+      permissionHost = ''
+      await loadDocument()
+      startAutoRefresh()
+    } catch {
+      /* user dismissed the prompt — leave the error state in place */
+    }
   }
 
   async function loadDocument(): Promise<void> {
@@ -100,7 +129,16 @@
         readingTime: stats.readingTime,
       })
     } catch (e) {
-      error = e instanceof Error ? e.message : 'Unknown error'
+      const pe = e as PermissionError
+      if (pe?.code === 'PERMISSION_REQUIRED') {
+        errorType = 'permission'
+        permissionOrigin = pe.origin ?? ''
+        permissionHost = pe.host ?? ''
+        error = pe.message
+      } else {
+        errorType = 'network'
+        error = e instanceof Error ? e.message : 'Unknown error'
+      }
     }
   }
 
@@ -196,7 +234,14 @@
 </script>
 
 {#if error}
-  <ErrorPage {error} type={errorType} />
+  <ErrorPage
+    {error}
+    type={errorType}
+    {permissionOrigin}
+    host={permissionHost}
+    lang={$settings.language}
+    onGrant={grantPermission}
+  />
 {:else}
   {#if $settings.showProgressBar}
     <ProgressBar />
