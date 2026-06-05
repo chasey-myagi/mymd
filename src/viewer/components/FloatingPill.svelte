@@ -7,7 +7,10 @@
   import Outline from './Outline.svelte'
   import FileList from './FileList.svelte'
 
-  let expanded = false
+  let expanded = true
+  // Default-expanded should appear statically; only animate the panel in when
+  // the user re-opens it (CLAUDE.md: no motion on initial page appearance).
+  let animateOpen = false
   let isClosing = false
   let activeTab: 'outline' | 'files' = 'outline'
   let fileCount = 0
@@ -27,6 +30,7 @@
       close()
     } else {
       expanded = true
+      animateOpen = true
       justOpened = true
       setTimeout(() => { justOpened = false }, 300)
     }
@@ -75,6 +79,7 @@
     <div
       class="pill-panel"
       class:is-closing={isClosing}
+      class:animate-open={animateOpen}
       role="dialog"
       aria-label={t('docPanel', lang)}
     >
@@ -242,6 +247,10 @@
     flex-direction: column;
     overflow: hidden;
     transform-origin: top left;
+  }
+
+  /* Entrance animation only when the user re-opens — not on initial load */
+  .pill-panel.animate-open {
     animation: panel-open 0.2s ease-out both;
   }
 
@@ -518,6 +527,6 @@
   @media (prefers-reduced-motion: reduce) {
     .pill-handle { animation: none; opacity: 0.65; }
     .pill-handle:hover { opacity: 1; }
-    .pill-panel, .pill-panel.is-closing { animation: none; }
+    .pill-panel, .pill-panel.is-closing, .pill-panel.animate-open { animation: none; }
   }
 </style>
