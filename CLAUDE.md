@@ -2,6 +2,18 @@
 
 Open-source Chrome Markdown preview extension. Svelte 4 + TypeScript + Vite + CRXJS.
 
+## Build & Release
+
+- `npm run build` — Vite 构建到 `dist/`（本地调试用 `chrome://extensions` 「加载已解压」指向 `dist/`）。
+- `npm run package` — 发版打包，一条命令搞定：
+  1. 校验 `package.json` 与 `manifest.json` 版本号一致（不一致直接报错）；
+  2. `npm run build`；
+  3. 把 `dist/` **内容**（manifest 在压缩包根部，CWS 要求）打成 `mymd-v<版本>.zip`。
+  - 依赖系统 `zip` 命令（macOS/Linux 自带）。脚本见 `scripts/package.mjs`。
+- `npm run test:run` — vitest 全量跑一遍。
+
+**发版步骤**：① 同步改 `manifest.json` 和 `package.json` 的 `version`（CWS 不允许重复版本号，每次上传必须递增）→ ② `npm run package` → ③ 把 `mymd-v<版本>.zip` 传到 Chrome Web Store 后台。
+
 ## Design Context
 
 ### Users
